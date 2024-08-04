@@ -1,22 +1,19 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import pyodbc
-
+from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Replace 'your_secret_key' with a real secret key
 
-def get_db_connection(): # you will need to change the Server name to yours
+def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-NOS3O0I;'
-        'DATABASE=HMS;'
+        'SERVER=AHMED\SQLEXPRESS;'
+        'DATABASE=HMS1;'
         'Trusted_Connection=yes;'
     )
     conn = pyodbc.connect(connection_string)
     return conn
-
-conn = get_db_connection()
-cur = conn.cursor()
-
 
 @app.route('/')
 def index():
@@ -30,14 +27,40 @@ def home():
 def index1():
     return render_template('index1.html')
 
-@app.route('/contact.html')
+@app.route('/contact.html', methods=['GET', 'POST'])
 def contact():
+    if request.method == 'POST':
+        try:
+            name = request.form['txtName']
+            email = request.form['txtEmail']
+            phone = request.form['txtPhone']
+            message = request.form['txtMsg']
+            date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            query = """
+            INSERT INTO ContactMessages (name, Contact, email, message, date)
+            VALUES (?, ?, ?, ?, ?)
+            """
+            cur.execute(query, (name, phone, email, message, date))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            flash('Your message has been sent successfully!', 'success')
+        except Exception as e:
+            flash(f'An error occurred while sending your message: {e}', 'danger')
+            print(e)
+        
+        return redirect(url_for('contact'))
+    
     return render_template('contact.html')
 
 @app.route('/services.html')
 def services():
     return render_template('services.html')
-
 
 @app.route('/doctor-panel.html')
 def doctor():
@@ -46,8 +69,6 @@ def doctor():
 @app.route('/patient-panel.html')
 def patient():
     return render_template('patient-panel.html')
-
-
 
 @app.route('/admin-panel1.html')
 def admin():
