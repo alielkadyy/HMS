@@ -30,6 +30,7 @@ def doctor():
 @app.route('/patient-panel.html')
 def patient():
     return render_template('patient-panel.html')
+#a7a ya ged3an
 
 
 @app.route('/admin-panel1.html')
