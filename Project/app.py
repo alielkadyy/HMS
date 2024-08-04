@@ -1,6 +1,22 @@
 from flask import Flask, render_template
+import pyodbc
+
 
 app = Flask(__name__)
+
+def get_db_connection(): # you will need to change the Server name to yours
+    connection_string = (
+        'DRIVER={ODBC Driver 17 for SQL Server};'
+        'SERVER=DESKTOP-NOS3O0I;'
+        'DATABASE=HMS;'
+        'Trusted_Connection=yes;'
+    )
+    conn = pyodbc.connect(connection_string)
+    return conn
+
+conn = get_db_connection()
+cur = conn.cursor()
+
 
 @app.route('/')
 def index():
