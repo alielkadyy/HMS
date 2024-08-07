@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-
+<title>Admin-Panel</title>
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -42,6 +42,7 @@
   <style >
     .bg-primary {
     background: -webkit-linear-gradient(left, #3931af, #00c6ff);
+    
 }
 
 .col-md-4{
@@ -70,6 +71,34 @@
   background-color: #3c50c1;
   border-color: #3c50c1;
 }
+
+table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 16px;
+        text-align: left;
+    }
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #f4f4f4;
+        color: #333;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+    button:hover {
+        cursor: pointer;
+    }
+    #inputbtn:hover {
+        cursor: pointer;
+    }
   </style>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -101,8 +130,7 @@
       <a class="list-group-item list-group-item-action" href="#list-pres" id="list-pres-list"  role="tab" data-toggle="list" aria-controls="home">Prescription List</a>
       <a class="list-group-item list-group-item-action" href="#list-settings" id="list-adoc-list"  role="tab" data-toggle="list" aria-controls="home">Add Doctor</a>
       <a class="list-group-item list-group-item-action" href="#list-settings1" id="list-ddoc-list"  role="tab" data-toggle="list" aria-controls="home">Delete Doctor</a>
-      <a class="list-group-item list-group-item-action" href="#list-mes" id="list-mes-list"  role="tab" data-toggle="list" aria-controls="home">Queries</a>
-      
+
     </div><br>
   </div>
   <div class="col-md-8" style="margin-top: 3%;">
@@ -118,6 +146,7 @@
                     <div class="panel-body">
                       <span class="fa-stack fa-2x"> <i class="fa fa-square fa-stack-2x text-primary"></i> <i class="fa fa-users fa-stack-1x fa-inverse"></i> </span>
                       <h4 class="StepTitle" style="margin-top: 5%;">Doctor List</h4>
+                      
                       <script>
                         function clickDiv(id) {
                           document.querySelector(id).click();
@@ -137,6 +166,7 @@
                     <div class="panel-body" >
                       <span class="fa-stack fa-2x"> <i class="fa fa-square fa-stack-2x text-primary"></i> <i class="fa fa-users fa-stack-1x fa-inverse"></i> </span>
                       <h4 class="StepTitle" style="margin-top: 5%;">Patient List</h4>
+                      
                       
                       <p class="cl-effect-1">
                         <a href="#app-hist" onclick="clickDiv('#list-pat-list')">
@@ -223,41 +253,33 @@
         <div class="col-md-2"><input type="submit" name="doctor_search_submit" class="btn btn-primary" value="Search"></div></div>
       </form>
     </div>
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col">Doctor Name</th>
-                    <th scope="col">Specialization</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Password</th>
-                    <th scope="col">Fees</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php 
-                    $con=mysqli_connect("localhost","root","","myhmsdb");
-                    global $con;
-                    $query = "select * from doctb";
-                    $result = mysqli_query($con,$query);
-                    while ($row = mysqli_fetch_array($result)){
-                      $username = $row['username'];
-                      $spec = $row['spec'];
-                      $email = $row['email'];
-                      $password = $row['password'];
-                      $docFees = $row['docFees'];
-                      
-                      echo "<tr>
-                        <td>$username</td>
-                        <td>$spec</td>
-                        <td>$email</td>
-                        <td>$password</td>
-                        <td>$docFees</td>
-                      </tr>";
-                    }
-
-                  ?>
-                </tbody>
-              </table>
+    <table>
+      <thead>
+          <tr>
+              <th>First_Name</th>
+              <th>Last_Name</th>
+              <th>Specialization</th>
+              <th>Email</th>
+              <th>Password</th>
+              <th>Fees</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for row in doctors %}
+          <tr>
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }}</td>
+              <td>{{ row[2] }}</td>
+              <td>{{ row[3] }}</td>
+              <td>{{ row[4] }}</td>
+              <td>{{ row[5] }}</td>
+              <td>{{ row[6] }}</td>
+              <td>{{ row[7] }}</td>
+              <td>{{ row[8] }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
         <br>
       </div>
     
@@ -272,47 +294,34 @@
       </form>
     </div>
         
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                  <th scope="col">Patient ID</th>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Gender</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Password</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php 
-                    $con=mysqli_connect("localhost","root","","myhmsdb");
-                    global $con;
-                    $query = "select * from patreg";
-                    $result = mysqli_query($con,$query);
-                    while ($row = mysqli_fetch_array($result)){
-                      $pid = $row['pid'];
-                      $fname = $row['fname'];
-                      $lname = $row['lname'];
-                      $gender = $row['gender'];
-                      $email = $row['email'];
-                      $contact = $row['contact'];
-                      $password = $row['password'];
-                      
-                      echo "<tr>
-                        <td>$pid</td>
-                        <td>$fname</td>
-                        <td>$lname</td>
-                        <td>$gender</td>
-                        <td>$email</td>
-                        <td>$contact</td>
-                        <td>$password</td>
-                      </tr>";
-                    }
-
-                  ?>
-                </tbody>
-              </table>
+    <table>
+      <thead>
+          <tr>
+              <th>Patient_iD</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Gender</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Password</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for row in patients %}
+          <tr>
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }}</td>
+              <td>{{ row[2] }}</td>
+              <td>{{ row[3] }}</td>
+              <td>{{ row[4] }}</td>
+              <td>{{ row[5] }}</td>
+              <td>{{ row[6] }}</td>
+              <td>{{ row[7] }}</td>
+              <td>{{ row[8] }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
         <br>
       </div>
 
@@ -325,57 +334,40 @@
         
     
         
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                  <th scope="col">Doctor</th>
-                    <th scope="col">Patient ID</th>
-                    <th scope="col">Appointment ID</th>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Appointment Date</th>
-                    <th scope="col">Appointment Time</th>
-                    <th scope="col">Disease</th>
-                    <th scope="col">Allergy</th>
-                    <th scope="col">Prescription</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php 
-                    $con=mysqli_connect("localhost","root","","myhmsdb");
-                    global $con;
-                    $query = "select * from prestb";
-                    $result = mysqli_query($con,$query);
-                    while ($row = mysqli_fetch_array($result)){
-                      $doctor = $row['doctor'];
-                      $pid = $row['pid'];
-                      $ID = $row['ID'];
-                      $fname = $row['fname'];
-                      $lname = $row['lname'];
-                      $appdate = $row['appdate'];
-                      $apptime = $row['apptime'];
-                      $disease = $row['disease'];
-                      $allergy = $row['allergy'];
-                      $pres = $row['prescription'];
-
-                      
-                      echo "<tr>
-                        <td>$doctor</td>
-                        <td>$pid</td>
-                        <td>$ID</td>
-                        <td>$fname</td>
-                        <td>$lname</td>
-                        <td>$appdate</td>
-                        <td>$apptime</td>
-                        <td>$disease</td>
-                        <td>$allergy</td>
-                        <td>$pres</td>
-                      </tr>";
-                    }
-
-                  ?>
-                </tbody>
-              </table>
+          <table>
+            <thead>
+                <tr>
+                    <th>Doctor First_Name</th>
+                    <th>Doctor _Last_Name</th>
+                    <th>Patient_ID</th>
+                    <th>Appointment_ID</th>
+                    <th>Patient_First_Name</th>
+                    <th>Patient_Last_Name</th>
+                    <th>Appointment_Date</th>
+                    <th>Appointment_Time</th>
+                    <th>Disease</th>
+                    <th>Allergy</th>
+                    <th>Prescription</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in prescriptions %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ row[6] }}</td>
+                    <td>{{ row[7] }}</td>
+                    <td>{{ row[8] }}</td>
+                    <td>{{ row[9] }}</td>
+                    <td>{{ row[10] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <br>
       </div>
       </div>
@@ -394,109 +386,110 @@
       </form>
     </div>
         
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                  <th scope="col">Appointment ID</th>
-                  <th scope="col">Patient ID</th>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Gender</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Contact</th>
-                    <th scope="col">Doctor Name</th>
-                    <th scope="col">Consultancy Fees</th>
-                    <th scope="col">Appointment Date</th>
-                    <th scope="col">Appointment Time</th>
-                    <th scope="col">Appointment Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php 
+    <table>
+      <thead>
+          <tr>
+              <th>Appointment ID</th>
+              <th>Patient ID</th>
+              <th>Patient First Name</th>
+              <th>Patient Last Name</th>
+              <th>Patient Gender</th>
+              <th>Patient Email</th>
+              <th>Patient Contact</th>
+              <th>Doctor First Name</th>
+              <th>Doctor Last Name</th>
+              <th>Fees</th>
+              <th>Appointment Date</th>
+              <th>Appointment Time</th>
+              <th>Appointment Status</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for row in appointments %}
+          <tr>
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }}</td>
+              <td>{{ row[2] }}</td>
+              <td>{{ row[3] }}</td>
+              <td>{{ row[4] }}</td>
+              <td>{{ row[5] }}</td>
+              <td>{{ row[6] }}</td>
+              <td>{{ row[7] }}</td>
+              <td>{{ row[8] }}</td>
+              <td>{{ row[9] }}</td>
+              <td>{{ row[10] }}</td>
+              <td>{{ row[11] }}</td>
+              <td>{{ row[12] }}</td>
+              <td>{{ row[13] }}</td>
+              <td>{{ row[14] }}</td>
 
-                    $con=mysqli_connect("localhost","root","","myhmsdb");
-                    global $con;
-
-                    $query = "select * from appointmenttb;";
-                    $result = mysqli_query($con,$query);
-                    while ($row = mysqli_fetch_array($result)){
-                  ?>
-                      <tr>
-                        <td><?php echo $row['ID'];?></td>
-                        <td><?php echo $row['pid'];?></td>
-                        <td><?php echo $row['fname'];?></td>
-                        <td><?php echo $row['lname'];?></td>
-                        <td><?php echo $row['gender'];?></td>
-                        <td><?php echo $row['email'];?></td>
-                        <td><?php echo $row['contact'];?></td>
-                        <td><?php echo $row['doctor'];?></td>
-                        <td><?php echo $row['docFees'];?></td>
-                        <td><?php echo $row['appdate'];?></td>
-                        <td><?php echo $row['apptime'];?></td>
-                        <td>
-                    <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
-                    {
-                      echo "Active";
-                    }
-                    if(($row['userStatus']==0) && ($row['doctorStatus']==1))  
-                    {
-                      echo "Cancelled by Patient";
-                    }
-
-                    if(($row['userStatus']==1) && ($row['doctorStatus']==0))  
-                    {
-                      echo "Cancelled by Doctor";
-                    }
-                        ?></td>
-                      </tr>
-                    <?php } ?>
-                </tbody>
-              </table>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
         <br>
       </div>
 
 <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
 
       <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
+       
         <form class="form-group" method="post" action="admin-panel1.html">
           <div class="row">
-                  <div class="col-md-4"><label>Doctor Name:</label></div>
-                  <div class="col-md-8"><input type="text" class="form-control" name="doctor" onkeydown="return alphaOnly(event);" required></div><br><br>
-                  <div class="col-md-4"><label>Specialization:</label></div>
-                  <div class="col-md-8">
-                   <select name="special" class="form-control" id="special" required="required">
-                      <option value="head" name="spec" disabled selected>Select Specialization</option>
-                      <option value="General" name="spec">General</option>
-                      <option value="Cardiologist" name="spec">Cardiologist</option>
-                      <option value="Neurologist" name="spec">Neurologist</option>
-                      <option value="Pediatrician" name="spec">Pediatrician</option>
-                    </select>
-                    </div><br><br>
-                  <div class="col-md-4"><label>Email ID:</label></div>
-                  <div class="col-md-8"><input type="email"  class="form-control" name="demail" required></div><br><br>
-                  <div class="col-md-4"><label>Password:</label></div>
-                  <div class="col-md-8"><input type="password" class="form-control"  onkeyup='check();' name="dpassword" id="dpassword"  required></div><br><br>
-                  <div class="col-md-4"><label>Confirm Password:</label></div>
-                  <div class="col-md-8"  id='cpass'><input type="password" class="form-control" onkeyup='check();' name="cdpassword" id="cdpassword" required>&nbsp &nbsp<span id='message'></span> </div><br><br>
-                   
-                  
-                  <div class="col-md-4"><label>Consultancy Fees:</label></div>
-                  <div class="col-md-8"><input type="text" class="form-control"  name="docFees" required></div><br><br>
-                </div>
-          <input type="submit" name="docsub" value="Add Doctor" class="btn btn-primary">
-        </form>
+              <div class="col-md-4"><label>First Name:</label></div>
+              <div class="col-md-8"><input type="text" class="form-control" name="first_name" required></div><br><br>
+              <div class="col-md-4"><label>Last Name:</label></div>
+              <div class="col-md-8"><input type="text" class="form-control" name="last_name" required></div><br><br>
+              <div class="col-md-4"><label>Gender:</label></div>
+              <div class="col-md-8">
+                  <select name="gender" class="form-control" required>
+                      <option value="" disabled selected>Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                  </select>
+              </div><br><br>
+              <div class="col-md-4"><label>Email ID:</label></div>
+              <div class="col-md-8"><input type="email" class="form-control" name="email" required></div><br><br>
+              <div class="col-md-4"><label>Contact:</label></div>
+              <div class="col-md-8"><input type="text" class="form-control" name="contact" required></div><br><br>
+              <div class="col-md-4"><label>Password:</label></div>
+              <div class="col-md-8"><input type="password" class="form-control" name="password" id="password" required></div><br><br>
+              <div class="col-md-4"><label>Confirm Password:</label></div>
+              <div class="col-md-8" id='cpass'><input type="password" class="form-control" name="confirm_password" id="confirm_password" required>&nbsp;&nbsp;<span id='message'></span></div><br><br>
+              <div class="col-md-4"><label>Specialization:</label></div>
+              <div class="col-md-8"><input type="text" class="form-control" name="specialization" required></div><br><br>
+              
+          </div>
+          <input type="submit" name="submit" value="Add Doctor" class="btn btn-primary">
+      </form>
+       
+       
+       
+        
       </div>
 
       <div class="tab-pane fade" id="list-settings1" role="tabpanel" aria-labelledby="list-settings1-list">
-        <form class="form-group" method="post" action="admin-panel1.html">
+
+        <div class="container">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="alert alert-info">
+                {% for message in messages %}
+                  {{ message }}<br>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+        <form class="form-group" method="post" action="/delete-doctor">
           <div class="row">
-          
-                  <div class="col-md-4"><label>Email ID:</label></div>
-                  <div class="col-md-8"><input type="email"  class="form-control" name="demail" required></div><br><br>
-                  
-                </div>
-          <input type="submit" name="docsub1" value="Delete Doctor" class="btn btn-primary" onclick="confirm('do you really want to delete?')">
-        </form>
+              <div class="col-md-4"><label>Email ID:</label></div>
+              <div class="col-md-8"><input type="email" class="form-control" name="demail" required></div><br><br>
+          </div>
+          <input type="submit" name="docsub1" value="Delete Doctor" class="btn btn-primary" onclick="return confirm('Do you really want to delete?');">
+      </form>
+      
       </div>
 
 
