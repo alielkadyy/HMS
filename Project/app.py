@@ -51,6 +51,7 @@ def login_doctor():
 
     if user:
         session['user_id'] = user[0]  # Assuming the first column is the user ID
+        session['role'] = user[7]
         return redirect(url_for('doctor'))  # Replace with actual doctor dashboard route
     else:
         return render_template('index.html', error_message_doctor='Wrong Email/Password')
@@ -69,6 +70,7 @@ def login_admin():
 
     if user:
         session['user_id'] = user[0]
+        session['role'] = user[7]
         return redirect(url_for('admin'))  # Replace with actual admin dashboard route
     else:
         return render_template('index.html', error_message_admin='Wrong Email/Password')
@@ -164,6 +166,7 @@ def login():
 
     if user:
         session['user_id'] = user[0]  # Assuming the first column is the user ID
+        session['role'] = user[7]
         return redirect(url_for('patient'))  # Redirect to the patient panel
     else:
         flash('Invalid email or password', 'error')
@@ -219,15 +222,53 @@ def services():
 
 @app.route('/doctor-panel.html')
 def doctor():
-     return render_template('doctor-panel.html')
+    doctor_id = session['user_id']   # Replace this with the actual doctor ID from the session
+    Role = session['role']
+    if doctor_id and Role == 'Doctor':
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
+        cursor.execute('EXEC AppointmentDetailsFromDoctor ?',doctor_id)
+        app_list = cursor.fetchall()
+
+        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , doctor_id)
+        username = cursor.fetchone()
+
+        cursor.execute('EXEC PrescriptionsDetailsFromDoctor ?',doctor_id)
+        pr_list = cursor.fetchall()
+    
+        
+        
+        conn.close()
+        return render_template('doctor-panel.html', app_list=app_list, username=username, pr_list=pr_list )
+    else:
+        return redirect(url_for('index'))
+@app.route('/prescribe.html')
+def prescribe():
+    doctor_id = session['user_id']   # Replace this with the actual doctor ID from the session
+    Role = session['role']
+    if doctor_id and Role == 'Doctor':
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , doctor_id)
+        username = cursor.fetchone()
+
+        
+        cursor.close()
+        conn.close()
+    else:
+       return redirect(url_for('index1')) 
+    return render_template('prescribe.html' , username=username)
+    
 @app.route('/patient-panel.html')
 def patient():
     conn = get_db_connection()
     cursor = conn.cursor()
     
     patientId = session['user_id']
-    if patientId:
+    Role = session['role']
+    if patientId and Role == 'Patient':
         cursor.execute("EXEC AppointmentHistoryForSpecificPatient ?", patientId)
         appointments = cursor.fetchall() 
 
@@ -254,8 +295,8 @@ def select_doctor():
     conn = get_db_connection()
     cursor = conn.cursor()
     patientId = session['user_id']
-
-    if patientId:
+    Role = session['role']
+    if patientId and Role == 'Patient':
         SelectedSpec = request.form['SelectSpecilization']
         cursor.execute("SELECT concat(first_name , ' ' , last_name) AS DocName FROM USERS WHERE specialization = ? AND role = ? " , (SelectedSpec, 'Doctor'))
         doctorList = cursor.fetchall()
@@ -268,11 +309,13 @@ def select_doctor():
 @app.route('/logout.html')
 def logout():
     session['user_id'] =  0
+    session['role'] = ''
     return render_template('logout.html')
 
 @app.route('/logout1.html')
 def logout1():
     session['user_id'] =  0
+    session['role'] = ''
     return render_template('logout1.html')
 
 if __name__ == '__main__':
