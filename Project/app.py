@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, url_for, render_template, flash, session
 import pyodbc
-
+from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'your_unique_secret_key'
 
@@ -68,6 +68,7 @@ def login_admin():
     conn.close()
 
     if user:
+        session['user_id'] = user[0]
         return redirect(url_for('admin'))  # Replace with actual admin dashboard route
     else:
         return render_template('index.html', error_message_admin='Wrong Email/Password')
@@ -180,9 +181,37 @@ def home():
 def index1():
     return render_template('index1.html')
 
-@app.route('/contact.html')
+@app.route('/contact.html', methods=['GET', 'POST'])
 def contact():
+    if request.method == 'POST':
+        try:
+            name = request.form['txtName']
+            email = request.form['txtEmail']
+            phone = request.form['txtPhone']
+            message = request.form['txtMsg']
+            date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            query = """
+            INSERT INTO ContactMessages (name, Contact, email, message, date)
+            VALUES (?, ?, ?, ?, ?)
+            """
+            cur.execute(query, (name, phone, email, message, date))
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            flash('Your message has been sent successfully!', 'success')
+        except Exception as e:
+            flash(f'An error occurred while sending your message: {e}', 'danger')
+            print(e)
+        
+        return redirect(url_for('contact'))
+    
     return render_template('contact.html')
+
 
 @app.route('/services.html')
 def services():
