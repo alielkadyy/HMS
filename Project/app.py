@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, render_template, flash, session
+from flask import Flask, request, redirect, url_for, render_template, flash, session,jsonify, request,get_flashed_messages
 import pyodbc
 from datetime import datetime
 app = Flask(__name__)
@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
+        'SERVER=MOTAZ-PC\SQLEXPRESS;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -164,7 +164,7 @@ def login():
 
     if user:
         session['user_id'] = user[0]  # Assuming the first column is the user ID
-        return redirect(url_for('patient'))  # Redirect to the patient panel
+        return redirect(url_for('patient_panel'))  # Redirect to the patient panel
     else:
         flash('Invalid email or password', 'error')
         return redirect(url_for('index1'))  # Redirect back to login page
@@ -212,7 +212,6 @@ def contact():
     
     return render_template('contact.html')
 
-
 @app.route('/services.html')
 def services():
     return render_template('services.html')
@@ -221,48 +220,116 @@ def services():
 def doctor():
      return render_template('doctor-panel.html')
 
-@app.route('/patient-panel.html')
-def patient():
+
+@app.route('/patient-panel', methods=['GET', 'POST'])
+def patient_panel():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
+
+    # Fetch patient's username
     patientId = session['user_id']
-    if patientId:
-        cursor.execute("EXEC AppointmentHistoryForSpecificPatient ?", patientId)
-        appointments = cursor.fetchall() 
+    cursor.execute("SELECT concat(first_name, ' ', last_name) FROM USERS WHERE user_id = ?", patientId)
+    username = cursor.fetchone()
 
-        cursor.execute("EXEC ViewPrescriptionForSpecificPatient ?", patientId)
-        prescription = cursor.fetchall()
+    # Fetch appointment history
+    cursor.execute("EXEC AppointmentHistoryForSpecificPatient ?", patientId)
+    appointments = cursor.fetchall()
 
-        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , patientId)
-        username = cursor.fetchone()
+    # Fetch prescriptions
+    cursor.execute("EXEC ViewPrescriptionForSpecificPatient ?", patientId)
+    prescription = cursor.fetchall()
 
+    # Handle form submission for doctor selection
+    if request.method == 'POST':
+        selected_specialization = request.form.get('specialization')
+        if selected_specialization:
+            cursor.execute("SELECT user_id, concat(first_name, ' ', last_name) FROM USERS WHERE specialization = ?", selected_specialization)
+            doctorList = cursor.fetchall()
+        else:
+            doctorList = []
+    else:
         cursor.execute("SELECT DISTINCT specialization FROM USERS WHERE specialization != ''")
         spec = cursor.fetchall()
+        doctorList = []
 
-        cursor.close()
-        conn.close()
-        return render_template('patient-panel.html', appointments=appointments , prescription=prescription , username=username , spec=spec)
-    else:
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
 
-        return redirect(url_for('index1'))
+    return render_template('patient-panel.html', appointments=appointments, prescription=prescription, username=username, spec=spec, doctorList=doctorList)
+
+
+@app.route('/get-doctors', methods=['POST'])
+def get_doctors():
+    specialization = request.form.get('specialization')
+    if not specialization:
+        return jsonify({'error': 'Specialization not provided'}), 400
     
-@app.route('/select-doctor' , methods=['post'])
-def select_doctor():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = """
+            SELECT user_id, concat(first_name, ' ', last_name)
+            FROM USERS
+            WHERE role = 'doctor' AND specialization = ?
+        """
+        cursor.execute(query, (specialization,))
+        doctors = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        # Convert tuple list to a list of dictionaries for JSON serialization
+        doctors_list = [{'user_id': doctor[0], 'name': doctor[1]} for doctor in doctors]
+        
+        return jsonify(doctors_list)
+    except Exception:
+        return jsonify({'error': 'An internal error occurred'}), 500
+
+@app.route('/create-appointment', methods=['POST'])
+def create_appointment():
+    # Get form data
+    specialization = request.form.get('SelectSpecilization')
+    doctor_name = request.form.get('doctors')
+    appointment_date = request.form.get('appdate')
+    appointment_time = request.form.get('apptime')
+    consultancy_fees = 250  # Fixed value
+
+    # Get the current patient ID
+    patient_id = session.get('user_id')
+    if not patient_id:
+        return "User not logged in."
+
+    # Debug print for doctor_name
+    print(f"Doctor Name to query: {doctor_name}")
+
+    # Get doctor_id from the users table
     conn = get_db_connection()
     cursor = conn.cursor()
-    patientId = session['user_id']
 
-    if patientId:
-        SelectedSpec = request.form['SelectSpecilization']
-        cursor.execute("SELECT concat(first_name , ' ' , last_name) AS DocName FROM USERS WHERE specialization = ? AND role = ? " , (SelectedSpec, 'Doctor'))
-        doctorList = cursor.fetchall()
+    cursor.execute("SELECT user_id FROM DoctorView WHERE full_name = ?;", (doctor_name,))
+    result = cursor.fetchone()
 
-        cursor.close()
+    if result:
+        doctor_id = result[0]
+    else:
         conn.close()
-    return redirect(url_for('patient',doctorList=doctorList))
+        return "Doctor not found. Please select a valid doctor."
+
+    # Insert into appointments table
+    cursor.execute(
+        "INSERT INTO appointments (date, status, patient_id, doctor_id) VALUES (?, 'Confirmed', ?, ?)",
+        (f"{appointment_date} {appointment_time}", patient_id, doctor_id)
+    )
+    conn.commit()
+    conn.close()
+
+    # Flash a success message
+    flash('Appointment set successfully!')
+    return redirect(url_for('patient_panel'))
+
+
+
 
 
 @app.route('/logout.html')
