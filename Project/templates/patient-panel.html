@@ -336,29 +336,10 @@ table {
               <td>{{ row[4] }}</td>
               <td>{{ row[5] }}</td>
               <td>
-                {% if row[5] != 'Cancelled by Patient' %}
+                {% if row[5] != 'Cancelled by Patient' and row[5] != 'Cancelled by Doctor' and row[5] != 'Confirmed' %}
                 <a href="#" 
                   onClick="return confirm('Are you sure you want to cancel this appointment ?')"
                   title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
-                  <script>
-                    function cancelAppointment(appointmentId) {
-                        if (confirm('Are you sure you want to cancel this appointment?')) {
-                            fetch(`/cancel-appointment/${appointmentId}`, {
-                                method: 'POST',
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert('Appointment cancelled successfully.');
-                                    location.reload(); // Reload the page to update the appointment status
-                                } else {
-                                    alert('Failed to cancel the appointment.');
-                                }
-                            })
-                            .catch(error => console.error('Error:', error));
-                        }
-                    }
-                    </script>
                      
                 </a>
                 {%else%}
@@ -373,7 +354,26 @@ table {
         <br>
       </div>
 
-
+      <script>
+        let appointmentId = 3
+        function cancelAppointment(appointmentId = 3) {
+            if (confirm('Are you sure you want to cancel this appointment?')) {
+                fetch(`/cancel-appointment/${appointmentId}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Appointment cancelled successfully.');
+                        location.reload(); // Reload the page to update the appointment status
+                    } else {
+                        alert('Failed to cancel the appointment.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+        </script>
 
       <div class="tab-pane fade" id="list-pres" role="tabpanel" aria-labelledby="list-pres-list">
         

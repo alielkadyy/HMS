@@ -389,7 +389,7 @@ def cancel_appointment(appointment_id):
         cursor.execute("""
             UPDATE Appointments 
             SET status = 'Cancelled by Patient' 
-            WHERE id = ?
+            WHERE appointment_id = ?
         """, (appointment_id,))
         conn.commit()
         conn.close()

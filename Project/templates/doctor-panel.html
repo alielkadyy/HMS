@@ -183,7 +183,7 @@
                       <td>{{ row[9] }}</td>
                      
                      <td>													
-                        {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' %}
+                        {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' and row[9] != 'Confirmed' %}
                         <a href="#" 
                           onClick="return confirm('Are you sure you want to cancel this appointment ?')"
                           title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
@@ -232,9 +232,9 @@
                       <td>{{ row[3] }}</td>
                       <td>{{ row[4] }}</td>
                       <td>{{ row[5] }}</td>
-                      <td>{{ row[6] }}</td>
-                      <td>{{ row[7] }}</td>
                       <td>{{ row[8] }}</td>
+                      <td>{{ row[7] }}</td>
+                      <td>{{ row[6] }}</td>
                       {% endfor %}
                 </tbody>
               </table>
