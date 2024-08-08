@@ -130,7 +130,7 @@ table {
       <a class="list-group-item list-group-item-action" href="#list-pres" id="list-pres-list"  role="tab" data-toggle="list" aria-controls="home">Prescription List</a>
       <a class="list-group-item list-group-item-action" href="#list-settings" id="list-adoc-list"  role="tab" data-toggle="list" aria-controls="home">Add Doctor</a>
       <a class="list-group-item list-group-item-action" href="#list-settings1" id="list-ddoc-list"  role="tab" data-toggle="list" aria-controls="home">Delete Doctor</a>
-
+     
     </div><br>
   </div>
   <div class="col-md-8" style="margin-top: 3%;">
@@ -491,6 +491,30 @@ table {
       </form>
       
       </div>
+
+
+      <div class="tab-pane fade" id="list-settings2" role="tabpanel" aria-labelledby="list-settings1-list">
+
+        <div class="container">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="alert alert-info">
+                {% for message in messages %}
+                  {{ message }}<br>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+        <form class="form-group" method="post" action="/delete-doctor">
+          <div class="row">
+              <div class="col-md-4"><label>Email ID:</label></div>
+              <div class="col-md-8"><input type="email" class="form-control" name="demail" required></div><br><br>
+          </div>
+          <input type="submit" name="docsub1" value="Delete Doctor" class="btn btn-primary" onclick="return confirm('Do you really want to delete?');">
+      </form>
+      
+   
 
 
        <div class="tab-pane fade" id="list-attend" role="tabpanel" aria-labelledby="list-attend-list">...</div>

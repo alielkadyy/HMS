@@ -2,6 +2,7 @@
 
 <html lang="en">
   <head>
+    <title> Patient-Panel</title>
 
 
     <!-- Required meta tags -->
@@ -173,135 +174,139 @@ table {
           <div class="card">
             <div class="card-body">
               <center><h4>Create an appointment</h4></center><br>
-            <form class="form-group" method='post' action="/select-doctor">
-                <div class="row">
-                    <div class="col-md-4">
+          
+              <!-- Flash message area -->
+              {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  <div class="alert alert-success mt-3">
+                      {% for category, message in messages %}
+                          <p>{{ message }}</p>
+                      {% endfor %}
+                  </div>
+              {% endif %}
+              {% endwith %}
+          
+              <form class="form-group" method="post" action="/create-appointment" onsubmit="return validateDate()">
+                  <!-- Specialization -->
+                  <div class="row">
+                      <div class="col-md-4">
                           <label for="spec">Specialization:</label>
-                        </div>
-                        <div class="col-md-8">
-                          <select name="SelectSpecilization" class="form-control" id="spec">
-                              <option value="SelectSpecilization" disabled selected>Select Specialization</option>
+                      </div>
+                      <div class="col-md-8">
+                          <select name="SelectSpecilization" class="form-control" id="spec" required>
+                              <option value="" disabled selected>Select Specialization</option>
                               {% for row in spec %}
-                                <option>{{ row[0] }}</option>
+                                  <option value="{{ row[0] }}">{{ row[0] }}</option>
                               {% endfor %}
                           </select>
-                        </div>
-                        <br><br>
-
-                        <script>
-                                document.getElementById('spec').onchange = function foo() {
-                                  let spec = this.value;   
-                                  console.log(spec)
-                                  let docs = [...document.getElementById('doctor').options];
-                                  
-                                  docs.forEach((el, ind, arr)=>{
-                                    arr[ind].setAttribute("style","");
-                                    if (el.getAttribute("data-spec") != spec ) {
-                                      arr[ind].setAttribute("style","display: none");
-                                    }
-                                  });
-                                };
-
-                  </script>
-              </form>
-              <div class="col-md-4"><label for="doctor">Doctors:</label></div>
-                <div class="col-md-8">
-            <form class="form-group" method='post' action="/select-doctor" >
-                    <select name="doctors" class="form-control" id="doctors" required="required">
-                      <option value="doctors" disabled selected>Select Doctor</option>
-                      {% for row in doctorList %}
-                      <option>{{ row[0] }}</option>
-
-                      {% endfor %}
-                    </select>
-                  </div><br/><br/> 
-
-              <script>
-              document.getElementById('doctor').onchange = function updateFees(e) {
-                var selection = document.querySelector(`[value=${this.value}]`).getAttribute('data-value');
-                document.getElementById('docFees').value = selection;
-              };
-            </script>
-            </form>
-
-                  
-                  
-
-                  
-                        <!-- <div class="col-md-4"><label for="doctor">Doctors:</label></div>
-                                <div class="col-md-8">
-                                    <select name="doctor" class="form-control" id="doctor1" required="required">
-                                      <option value="" disabled selected>Select Doctor</option>
-                                      
-                                    </select>
-                                </div>
-                                <br><br> -->
-
-                                <!-- <script>
-                                  document.getElementById("spec").onchange = function updateSpecs(event) {
-                                      var selected = document.querySelector(`[data-value=${this.value}]`).getAttribute("value");
-                                      console.log(selected);
-
-                                      var options = document.getElementById("doctor1").querySelectorAll("option");
-
-                                      for (i = 0; i < options.length; i++) {
-                                        var currentOption = options[i];
-                                        var category = options[i].getAttribute("data-spec");
-
-                                        if (category == selected) {
-                                          currentOption.style.display = "block";
-                                        } else {
-                                          currentOption.style.display = "none";
-                                        }
-                                      }
-                                    }
-                                </script> -->
-
-                        
-                    <!-- <script>
-                    let data = 
-                
-              document.getElementById('spec').onchange = function updateSpecs(e) {
-                let values = data.filter(obj => obj.spec == this.value).map(o => o.username);   
-                document.getElementById('doctor1').value = document.querySelector(`[value=${values}]`).getAttribute('data-value');
-              };
-            </script> -->
-
-
-                  
-                  <div class="col-md-4"><label for="consultancyfees">
-                                Consultancy Fees
-                              </label></div>
-                              <div class="col-md-8">
-                              <!-- <div id="docFees">Select a doctor</div> -->
-                              <input class="form-control" type="text" name="docFees" id="docFees" readonly="readonly" value="250$"/>
-                  </div><br><br>
-
-                  <div class="col-md-4"><label>Appointment Date</label></div>
-                  <div class="col-md-8"><input type="date" class="form-control datepicker" name="appdate"></div><br><br>
-
-                  <div class="col-md-4"><label>Appointment Time</label></div>
-                  <div class="col-md-8">
-                    <!-- <input type="time" class="form-control" name="apptime"> -->
-              <form class="form-group" method='post' action="/patient-panel" >
-                    <select name="apptime" class="form-control" id="apptime" required="required">
-                      <option value="" disabled selected>Select Time</option>
-                      <option value="08:00:00">8:00 AM</option>
-                      <option value="10:00:00">10:00 AM</option>
-                      <option value="12:00:00">12:00 PM</option>
-                      <option value="14:00:00">2:00 PM</option>
-                      <option value="16:00:00">4:00 PM</option>
-                    </select>
-              </form>
-                  </div><br><br>
-
-                  <div class="col-md-4">
-                    <input type="submit" name="app-submit" value="Create new entry" class="btn btn-primary" id="inputbtn">
-
+                      </div>
                   </div>
-                  <div class="col-md-8"></div>                  
-                </div>
+          
+                  <!-- Doctors -->
+                  <div class="row">
+                      <div class="col-md-4">
+                          <label for="doctor">Doctors:</label>
+                      </div>
+                      <div class="col-md-8">
+                          <select name="doctors" class="form-control" id="doctor" required>
+                              <option value="" disabled selected>Select Doctor</option>
+                          </select>
+                      </div>
+                  </div>
+          
+                  <!-- Consultancy Fees -->
+                  <div class="row">
+                      <div class="col-md-4">
+                          <label for="consultancyfees">Consultancy Fees:</label>
+                      </div>
+                      <div class="col-md-8">
+                          <input class="form-control" type="text" name="docFees" id="docFees" readonly="readonly" value="250$"/>
+                      </div>
+                  </div>
+          
+                  <!-- Appointment Date -->
+                  <div class="row">
+                      <div class="col-md-4">
+                          <label for="appdate">Appointment Date:</label>
+                      </div>
+                      <div class="col-md-8">
+                          <input type="date" class="form-control" name="appdate" id="appdate" required>
+                      </div>
+                  </div>
+          
+                  <!-- Appointment Time -->
+                  <div class="row">
+                      <div class="col-md-4">
+                          <label for="apptime">Appointment Time:</label>
+                      </div>
+                      <div class="col-md-8">
+                          <select name="apptime" class="form-control" id="apptime" required>
+                              <option value="" disabled selected>Select Time</option>
+                              <option value="08:00:00">8:00 AM</option>
+                              <option value="10:00:00">10:00 AM</option>
+                              <option value="12:00:00">12:00 PM</option>
+                              <option value="14:00:00">2:00 PM</option>
+                              <option value="16:00:00">4:00 PM</option>
+                          </select>
+                      </div>
+                  </div>
+          
+                  <div class="row">
+                      <div class="col-md-12">
+                          <input type="submit" name="app-submit" value="Create new entry" class="btn btn-primary" id="inputbtn">
+                      </div>
+                  </div>
               </form>
+          
+              <script>
+                  document.getElementById('spec').onchange = function() {
+                      let specialization = this.value;
+          
+                      if (specialization) {
+                          fetch('/get-doctors', {
+                              method: 'POST',
+                              headers: {
+                                  'Content-Type': 'application/x-www-form-urlencoded'
+                              },
+                              body: new URLSearchParams({ 'specialization': specialization })
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                              let doctorSelect = document.getElementById('doctor');
+                              doctorSelect.innerHTML = '<option value="" disabled selected>Select Doctor</option>';
+          
+                              data.forEach(doctor => {
+                                  let option = document.createElement('option');
+                                  option.value = doctor.name;
+                                  option.textContent = doctor.name;
+                                  doctorSelect.appendChild(option);
+                              });
+                          })
+                          .catch(error => console.error('Error fetching doctors:', error));
+                      } else {
+                          document.getElementById('doctor').innerHTML = '<option value="" disabled selected>Select Doctor</option>';
+                      }
+                  };
+          
+                  function validateDate() {
+                      const appDateInput = document.getElementById('appdate');
+                      const appDate = new Date(appDateInput.value);
+                      const today = new Date();
+                      const oneYearFromNow = new Date();
+                      oneYearFromNow.setFullYear(today.getFullYear() + 1);
+          
+                      if (appDate < today || appDate > oneYearFromNow) {
+                          alert('Appointment date must be between today and one year from now.');
+                          return false; // Prevent form submission
+                      }
+                      return true; // Allow form submission
+                  }
+              </script>
+
+          
+            
+
+              
             </div>
           </div>
         </div><br>
@@ -312,11 +317,12 @@ table {
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th> Doctor Name</th>
+                    <th> First Name</th>
+                    <th> Last Name</th>
                     <th> Consultancy Fees</th>
                     <th> Appointment Date</th>
                     <th> Appointment Time</th>
-                    <th> Current Status</th>
+                    <th> Status</th>
                     <th> Action</th>
                   </tr>
                 </thead>
@@ -328,9 +334,8 @@ table {
               <td>{{ row[2] }}</td>
               <td>{{ row[3] }}</td>
               <td>{{ row[4] }}</td>
+              <td>{{ row[5] }}</td>
               <td>
-                <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
-                { ?>
 
                   
                   <a href="admin-panel.html?ID=<?php echo $row['ID']?>&cancel=update" 
