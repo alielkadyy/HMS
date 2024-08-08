@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=MOTAZ-PC\SQLEXPRESS;'
+        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -260,6 +260,7 @@ def prescribe():
         cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , doctor_id)
         username = cursor.fetchone()
 
+
         cursor.close()
         conn.close()
     else:
@@ -319,7 +320,7 @@ def get_doctors():
         query = """
             SELECT user_id, concat(first_name, ' ', last_name)
             FROM USERS
-            WHERE role = 'doctor' AND specialization = ?
+            WHERE role = 'Doctor' AND specialization = ?
         """
         cursor.execute(query, (specialization,))
         doctors = cursor.fetchall()
@@ -354,12 +355,9 @@ def create_appointment():
     # Get doctor_id from the users table
     conn = get_db_connection()
     cursor = conn.cursor()
-    patientId = session['user_id']
-    Role = session['role']
-    if patientId and Role == 'Patient':
-        SelectedSpec = request.form['SelectSpecilization']
-        cursor.execute("SELECT concat(first_name , ' ' , last_name) AS DocName FROM USERS WHERE specialization = ? AND role = ? " , (SelectedSpec, 'Doctor'))
-        doctorList = cursor.fetchall()
+
+    cursor.execute("SELECT user_id FROM DoctorView WHERE full_name = ?;", (doctor_name,))
+    result = cursor.fetchone()
 
     if result:
         doctor_id = result[0]
@@ -369,7 +367,7 @@ def create_appointment():
 
     # Insert into appointments table
     cursor.execute(
-        "INSERT INTO appointments (date, status, patient_id, doctor_id) VALUES (?, 'Confirmed', ?, ?)",
+        "INSERT INTO Appointments (date, status, patient_id, doctor_id) VALUES (?, 'Pending', ?, ?)",
         (f"{appointment_date} {appointment_time}", patient_id, doctor_id)
     )
     conn.commit()
@@ -379,22 +377,43 @@ def create_appointment():
     flash('Appointment set successfully!')
     return redirect(url_for('patient_panel'))
 
+@app.route('/cancel-appointment/<int:appointment_id>', methods=['POST'])
+def cancel_appointment(appointment_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE Appointments 
+            SET status = 'Cancelled by Patient' 
+            WHERE id = ?
+        """, (appointment_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(e)
+        return jsonify({'success': False}), 500
+    
+    
+@app.route('/bill_template.html')
+def Payment():
+    patientId = session['user_id']
+    Role = session['role']
 
-
+    if patientId and Role == 'Patient':
+      return render_template('bill_template.html')
 
 
 @app.route('/logout.html')
 def logout():
     session['role']=''
     session['user_id'] =  0
-    session['role'] = ''
     return render_template('logout.html')
 
 @app.route('/logout1.html')
 def logout1():
     session['role']=''
     session['user_id'] =  0
-    session['role'] = ''
     return render_template('logout1.html')
 
 if __name__ == '__main__':

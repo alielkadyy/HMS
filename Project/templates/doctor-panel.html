@@ -182,46 +182,25 @@
                       <td>{{ row[8] }}</td>
                       <td>{{ row[9] }}</td>
                      
-                        <td>
-                    <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
-                    {
-                      echo "Active";
-                    }
-                    if(($row['userStatus']==0) && ($row['doctorStatus']==1))  
-                    {
-                      echo "Cancelled by Patient";
-                    }
-
-                    if(($row['userStatus']==1) && ($row['doctorStatus']==0))  
-                    {
-                      echo "Cancelled by You";
-                    }
-                        ?></td>
-
-                     <td>
-                        <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
-                        { ?>
-
-													
-	                        <a href="doctor-panel.html?ID=<?php echo $row['ID']?>&cancel=update" 
-                              onClick="return confirm('Are you sure you want to cancel this appointment ?')"
-                              title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
-	                        <?php } else {
-
-                                echo "Cancelled";
-                                } ?>
-                        
+                     <td>													
+                        {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' %}
+                        <a href="#" 
+                          onClick="return confirm('Are you sure you want to cancel this appointment ?')"
+                          title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
+                </a>
+                {%else%}
+                 ____________
+                {% endif %}
                         </td>
 
                         <td>
-
-                        <?php if(($row['userStatus']==1) && ($row['doctorStatus']==1))  
-                        { ?>
-
+                        {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' %}
                         <a href="prescribe.html"
                         tooltip-placement="top" tooltip="Remove" title="prescribe">
                         <button class="btn btn-success">Prescibe</button></a>
-                          
+                        {%else%}
+                         ____________
+                        {% endif %}
                         </td>
                       </tr></a>
                       {% endfor %}

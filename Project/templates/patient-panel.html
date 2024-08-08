@@ -336,16 +336,34 @@ table {
               <td>{{ row[4] }}</td>
               <td>{{ row[5] }}</td>
               <td>
-
-                  
-                  <a href="admin-panel.html?ID=<?php echo $row['ID']?>&cancel=update" 
-                      onClick="return confirm('Are you sure you want to cancel this appointment ?')"
-                      title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
-                  <?php } else {
-
-                        echo "Cancelled";
-                        } ?>
-                
+                {% if row[5] != 'Cancelled by Patient' %}
+                <a href="#" 
+                  onClick="return confirm('Are you sure you want to cancel this appointment ?')"
+                  title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
+                  <script>
+                    function cancelAppointment(appointmentId) {
+                        if (confirm('Are you sure you want to cancel this appointment?')) {
+                            fetch(`/cancel-appointment/${appointmentId}`, {
+                                method: 'POST',
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Appointment cancelled successfully.');
+                                    location.reload(); // Reload the page to update the appointment status
+                                } else {
+                                    alert('Failed to cancel the appointment.');
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
+                    }
+                    </script>
+                     
+                </a>
+                {%else%}
+                 ____________
+                {% endif %}
                 </td>
           </tr>
           {% endfor %}           
@@ -384,14 +402,9 @@ table {
                       <td>{{ row[5] }}</td>
                       <td>{{ row[6] }}</td>
                       <td>
-                        <form method="get">
-                        <!-- <a href="admin-panel.html?ID=" 
-                            onClick=""
-                            title="Pay Bill" tooltip-placement="top" tooltip="Remove"><button class="btn btn-success">Pay</button>
-                            </a></td> -->
 
-                            <a href="admin-panel.html? ID=<?php echo $row['ID']?>">
-                            <input type ="hidden" name="ID" value="<?php echo $row['ID']?>"/>
+                            <a href="bill_template.html">
+                            <input type ="hidden" name="ID" value=""/>
                             <input type = "submit" onclick="alert('Bill Paid Successfully');" name ="generate_bill" class = "btn btn-success" value="Pay Bill"/>
                             </a>
                             </td>
