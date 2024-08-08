@@ -130,6 +130,7 @@ table {
       <a class="list-group-item list-group-item-action" href="#list-pres" id="list-pres-list"  role="tab" data-toggle="list" aria-controls="home">Prescription List</a>
       <a class="list-group-item list-group-item-action" href="#list-settings" id="list-adoc-list"  role="tab" data-toggle="list" aria-controls="home">Add Doctor</a>
       <a class="list-group-item list-group-item-action" href="#list-settings1" id="list-ddoc-list"  role="tab" data-toggle="list" aria-controls="home">Delete Doctor</a>
+      <a class="list-group-item list-group-item-action" href="#list-mes" id="list-mes-list"  role="tab" data-toggle="list" aria-controls="home">Messages</a>
      
     </div><br>
   </div>
@@ -195,7 +196,7 @@ table {
                 </div>
 
                 <div class="row">
-                <div class="col-sm-4" style="left: 13%;margin-top: 5%;">
+                <div class="col-sm-4" style="left: -1%;margin-top: 5%;">
                   <div class="panel panel-white no-radius text-center">
                     <div class="panel-body" >
                       <span class="fa-stack fa-2x"> <i class="fa fa-square fa-stack-2x text-primary"></i> <i class="fa fa-list-ul fa-stack-1x fa-inverse"></i> </span>
@@ -211,7 +212,7 @@ table {
                 </div>
 
 
-                <div class="col-sm-4" style="left: 18%;margin-top: 5%">
+                <div class="col-sm-4" style="left: -1%;margin-top: 5%">
                   <div class="panel panel-white no-radius text-center">
                     <div class="panel-body" >
                       <span class="fa-stack fa-2x"> <i class="fa fa-square fa-stack-2x text-primary"></i> <i class="fa fa-plus fa-stack-1x fa-inverse"></i> </span>
@@ -222,6 +223,23 @@ table {
                         &nbsp|
                         <a href="#app-hist" onclick="clickDiv('#list-ddoc-list')">
                           Delete Doctors
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-sm-4" style="left: 2%; margin-top: 5%">
+                  <div class="panel panel-white no-radius text-center">
+                    <div class="panel-body">
+                      <span class="fa-stack fa-2x">
+                        <i class="fa fa-square fa-stack-2x text-primary"></i>
+                        <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                      </span>
+                      <h4 class="StepTitle" style="margin-top: 5%;">Messages</h4>
+                      <p class="cl-effect-1">
+                        <a href="#list-mes" onclick="clickDiv('#list-mes-list')">
+                          View Messages
                         </a>
                       </p>
                     </div>
@@ -513,21 +531,26 @@ table {
           </div>
           <input type="submit" name="docsub1" value="Delete Doctor" class="btn btn-primary" onclick="return confirm('Do you really want to delete?');">
       </form>
-      
-   
+        </div>
+       </div>
+      </div>
 
 
        <div class="tab-pane fade" id="list-attend" role="tabpanel" aria-labelledby="list-attend-list">...</div>
 
        <div class="tab-pane fade" id="list-mes" role="tabpanel" aria-labelledby="list-mes-list">
 
-         <div class="col-md-8">
+      <div class="col-md-8">
       <form class="form-group" action="messearch.html" method="post">
         <div class="row">
         <div class="col-md-10"><input type="text" name="mes_contact" placeholder="Enter Contact" class = "form-control"></div>
         <div class="col-md-2"><input type="submit" name="mes_search_submit" class="btn btn-primary" value="Search"></div></div>
       </form>
     </div>
+ 
+
+    
+
         
               <table class="table table-hover">
                 <thead>
@@ -539,27 +562,14 @@ table {
                   </tr>
                 </thead>
                 <tbody>
-                  <?php 
-
-                    $con=mysqli_connect("localhost","root","","myhmsdb");
-                    global $con;
-
-                    $query = "select * from contact;";
-                    $result = mysqli_query($con,$query);
-                    while ($row = mysqli_fetch_array($result)){
-              
-                      #$fname = $row['fname'];
-                      #$lname = $row['lname'];
-                      #$email = $row['email'];
-                      #$contact = $row['contact'];
-                  ?>
-                      <tr>
-                        <td><?php echo $row['name'];?></td>
-                        <td><?php echo $row['email'];?></td>
-                        <td><?php echo $row['contact'];?></td>
-                        <td><?php echo $row['message'];?></td>
-                      </tr>
-                    <?php } ?>
+                  {% for row in messages %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                </tr>
+                {% endfor %}
                 </tbody>
               </table>
         <br>

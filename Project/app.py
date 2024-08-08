@@ -94,9 +94,13 @@ def admin():
 
         cursor.execute("PrescriptionList")
         prescriptions = cursor.fetchall()
+
+        cursor.execute("SELECT name , email , contact , message FROM ContactMessages")
+        messages = cursor.fetchall()
+        
         cursor.close()
         conn.close()
-        return render_template('admin-panel1.html', doctors=doctors, patients=patients, appointments=appointments, prescriptions=prescriptions)
+        return render_template('admin-panel1.html', doctors=doctors, patients=patients, appointments=appointments, prescriptions=prescriptions ,messages=messages)
     else:
         return redirect(url_for('index'))
 
