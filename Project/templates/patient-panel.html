@@ -327,8 +327,8 @@ table {
                   </tr>
                 </thead>
                 <tbody>
-                  {% for row in appointments %}
-          <tr>
+               {% for row in appointments %}
+              <tr>
               <td>{{ row[0] }}</td>
               <td>{{ row[1] }}</td>
               <td>{{ row[2] }}</td>
@@ -338,9 +338,8 @@ table {
               <td>
                 {% if row[5] != 'Cancelled by Patient' and row[5] != 'Cancelled by Doctor' and row[5] != 'Confirmed' %}
                 <a href="#" 
-                  onClick="return confirm('Are you sure you want to cancel this appointment ?')"
+                  onClick="cancelAppointment({{ row[6] }})"
                   title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
-                     
                 </a>
                 {%else%}
                  ____________
@@ -355,8 +354,8 @@ table {
       </div>
 
       <script>
-        let appointmentId = 3
-        function cancelAppointment(appointmentId = 3) {
+        let appointmentId = row[6]
+        function cancelAppointment(appointmentId = row[6]) {
             if (confirm('Are you sure you want to cancel this appointment?')) {
                 fetch(`/cancel-appointment/${appointmentId}`, {
                     method: 'POST',

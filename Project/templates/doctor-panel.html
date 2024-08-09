@@ -185,14 +185,13 @@
                      <td>													
                         {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' and row[9] != 'Confirmed' %}
                         <a href="#" 
-                          onClick="return confirm('Are you sure you want to cancel this appointment ?')"
-                          title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
-                </a>
+                        onClick="cancelAppointment({{ row[10] }})"
+                        title="Cancel Appointment" tooltip-placement="top" tooltip="Remove"><button class="btn btn-danger">Cancel</button></a>
+                      </a>
                 {%else%}
                  ____________
                 {% endif %}
-                        </td>
-
+                      </td>
                         <td>
                         {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' %}
                         <a href="prescribe.html"
@@ -204,10 +203,31 @@
                         </td>
                       </tr></a>
                       {% endfor %}
+                      </tr>
                 </tbody>
               </table>
         <br>
       </div>
+      <script>
+        let appointmentId = row[1]
+        function cancelAppointment(appointmentId = row[1]) {
+            if (confirm('Are you sure you want to cancel this appointment?')) {
+                fetch(`/cancel-appointment/${appointmentId}`, {
+                    method: 'POST',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Appointment cancelled successfully.');
+                        location.reload(); // Reload the page to update the appointment status
+                    } else {
+                        alert('Failed to cancel the appointment.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+        </script>
       <div class="tab-pane fade" id="list-pres" role="tabpanel" aria-labelledby="list-pres-list">
         <table class="table table-hover">
                 <thead>

@@ -386,11 +386,18 @@ def cancel_appointment(appointment_id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE Appointments 
-            SET status = 'Cancelled by Patient' 
-            WHERE appointment_id = ?
-        """, (appointment_id,))
+        if session['user_id'] and session['role'] == 'Patient':
+            cursor.execute("""
+                UPDATE Appointments 
+                SET status = 'Cancelled by Patient' 
+                WHERE appointment_id = ?
+            """, [appointment_id])
+        elif session['user_id'] and session['role'] == 'Doctor':
+            cursor.execute("""
+                UPDATE Appointments 
+                SET status = 'Cancelled by Doctor' 
+                WHERE appointment_id = ?
+            """, [appointment_id])
         conn.commit()
         conn.close()
         return jsonify({'success': True})
