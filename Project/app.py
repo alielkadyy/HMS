@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
+        'SERVER=DESKTOP-F7J0SB1\SQLEXPRESS;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -251,6 +251,35 @@ def doctor():
         return render_template('doctor-panel.html', app_list=app_list, username=username, pr_list=pr_list )
     else:
         return redirect(url_for('index'))
+    
+@app.route('/search.html')
+def search_contact():
+
+    contact_number = request.args.get('contact')
+
+
+    # Connect to the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    doctor_id = session['user_id']
+    Role = session['role']
+
+    
+   
+    cursor.execute("EXEC ContactSearchAppDoctor ?,?",[doctor_id,contact_number])
+    ressearch = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('search.html', ressearch=ressearch)
+   
+
+
+    
+
+
+
 
 @app.route('/prescribe.html')
 def prescribe():
