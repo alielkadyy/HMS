@@ -1,1 +1,1 @@
-AppointmentHistoryForSpecificPatient
+EXEC AppointmentDetailsFromDoctor

@@ -405,7 +405,6 @@ def cancel_appointment(appointment_id):
         print(e)
         return jsonify({'success': False}), 500
     
-    
 @app.route('/bill_template.html')
 def Payment():
     patientId = session['user_id']
