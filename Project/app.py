@@ -306,7 +306,7 @@ def search_app_from_admin():
     cursor = conn.cursor()
     
 
-    cursor.execute("EXEC ContactSearchAppointmentAdminPanel ?",[contact_number])
+    cursor.execute("EXEC ContactSearchAppointmentAdminPanel1 ?",[contact_number])
     app_list = cursor.fetchall()
 
     cursor.close()
