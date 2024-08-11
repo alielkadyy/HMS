@@ -40,27 +40,41 @@
             <p>Bill for Appointment</p>
         </div>
         <div class="section">
-            <h2>Doctor Information</h2>
-            <p><strong>Doctor Name:</strong> </p>
-            <p><strong>Appointment ID:</strong></p>
+            <h2>Patient Information</h2>
+            <p>Patient Name: <strong>{{username[0]}}</strong></p>
+            <p><strong>------------------------------------------</strong> </p>
+        </div>
+       
+        <div class="section">
+           
+            {%for row in ans%}
+            <h2><strong>Doctor Information</strong></h2>
+            <p>Doctor Name: <strong>{{row[0]}}</strong></p>
+            <p>Appointment ID: <strong>{{row[1]}}</strong></p>
+            <p><strong>------------------------------------------</strong> </p>
+        </div>
+        
+        <div class="section">
+            <h2><strong>Appointment Details</strong></h2>
+            <p>Date: <strong>{{row[2]}}</strong> </p>
+            <p>Time: <strong>{{row[3]}}</strong> </p>
+            <p><strong>------------------------------------------</strong> </p>
         </div>
         <div class="section">
-            <h2>Appointment Details</h2>
-            <p><strong>Date:</strong> </p>
-            <p><strong>Time:</strong> </p>
+            <h2><strong>Medical Information</strong></h2>
+            <p>Diseases: <strong>{{row[4]}}</strong></p>
+            <p>Allergies: <strong>{{row[5]}}</strong> </p>
+            <p>Prescriptions: <strong>{{row[6]}}</strong> </p>
+            <p><strong>------------------------------------------</strong> </p>
         </div>
+        {%endfor%}
         <div class="section">
-            <h2>Medical Information</h2>
-            <p><strong>Diseases:</strong></p>
-            <p><strong>Allergies:</strong> </p>
-            <p><strong>Prescriptions:</strong> </p>
-        </div>
-        <div class="section">
-            <h2>Bill Amount</h2>
+            <h2><strong>Bill Amount</strong></h2>
             <p><strong>Amount:</strong> 250$ </p>
+            <p><strong>------------------------------------------</strong> </p>
         </div>
         <div class="footer">
-            <p>Thank you for visiting Global Hospital</p>
+            <p>-----------------Thank you for visiting Global Hospital-----------------</p>
         </div>
     </div>
 </body>
