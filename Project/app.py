@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-F7J0SB1\SQLEXPRESS;'
+        'SERVER=DESKTOP-NOS3O0I;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -476,19 +476,19 @@ def Payment():
     Role = session['role']
 
     if patientId and Role == 'Patient':
-      return render_template('bill_template.html')
+        return render_template('bill_template.html')
 
 
 @app.route('/logout.html')
 def logout():
-    session['role']=''
-    session['user_id'] =  0
+    session['role'] = ''
+    session['user_id'] = 0
     return render_template('logout.html')
 
 @app.route('/logout1.html')
 def logout1():
-    session['role']=''
-    session['user_id'] =  0
+    session['role'] = ''
+    session['user_id'] = 0
     return render_template('logout1.html')
 
 if __name__ == '__main__':
