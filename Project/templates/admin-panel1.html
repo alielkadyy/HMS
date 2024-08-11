@@ -305,11 +305,11 @@ table {
     <div class="tab-pane fade" id="list-pat" role="tabpanel" aria-labelledby="list-pat-list">
 
        <div class="col-md-8">
-      <form class="form-group" action="patientsearch.html" method="post">
-        <div class="row">
-        <div class="col-md-10"><input type="text" name="patient_contact" placeholder="Enter Contact" class = "form-control"></div>
-        <div class="col-md-2"><input type="submit" name="patient_search_submit" class="btn btn-primary" value="Search"></div></div>
+        <form action="/patient_search_admin.html" method="GET" class="form-inline">
+          <input type="text" name="contact" class="form-control" placeholder="Enter Contact">
+          <button type="submit" class="btn btn-primary">Search</button>
       </form>
+      
     </div>
         
     <table>
@@ -397,11 +397,12 @@ table {
       <div class="tab-pane fade" id="list-app" role="tabpanel" aria-labelledby="list-pat-list">
 
          <div class="col-md-8">
-      <form class="form-group" action="appsearch.html" method="post">
-        <div class="row">
-        <div class="col-md-10"><input type="text" name="app_contact" placeholder="Enter Contact" class = "form-control"></div>
-        <div class="col-md-2"><input type="submit" name="app_search_submit" class="btn btn-primary" value="Search"></div></div>
-      </form>
+          <form action="/appsearch.html" method="GET" class="form-inline">
+            <input type="text" name="contact1" class="form-control" placeholder="Enter Contact">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        
+        
     </div>
         
     <table>

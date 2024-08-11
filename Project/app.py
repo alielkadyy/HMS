@@ -253,7 +253,7 @@ def doctor():
         return redirect(url_for('index'))
     
 @app.route('/search.html')
-def search_contact():
+def search_contact_from_doctor():
 
     contact_number = request.args.get('contact')
 
@@ -275,8 +275,44 @@ def search_contact():
     return render_template('search.html', ressearch=ressearch)
    
 
+@app.route('/patient_search_admin.html')
+def search_patient_from_admin():
+
+    contact_number = request.args.get('contact')
+
+
+    # Connect to the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
 
     
+   
+    cursor.execute("EXEC ContactSearchPatientAdminPanel ?",[contact_number])
+    admin_patient_list = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('patient_search_admin.html', admin_patient_list=admin_patient_list)
+
+    
+@app.route('/appsearch.html')
+def search_app_from_admin():
+
+    contact_number = request.args.get('contact1')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+
+    cursor.execute("EXEC ContactSearchAppointmentAdminPanel ?",[contact_number])
+    app_list = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('appsearch.html', app_list=app_list)
 
 
 
