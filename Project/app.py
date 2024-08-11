@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-NOS3O0I;'
+        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -82,7 +82,7 @@ def admin():
     if admin_id and Role == 'Admin':
         conn = get_db_connection()
         cursor = conn.cursor()
-
+        
         cursor.execute("DoctorList")
         doctors = cursor.fetchall()
 
@@ -134,6 +134,7 @@ def delete_doctor():
         conn.close()
 
     return redirect(url_for('admin'))
+
 
 @app.route('/admin-panel1.html', methods=['POST'])
 def add_doctor():
@@ -281,12 +282,8 @@ def search_patient_from_admin():
     contact_number = request.args.get('contact')
 
 
-    # Connect to the database
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-
-    
    
     cursor.execute("EXEC ContactSearchPatientAdminPanel ?",[contact_number])
     admin_patient_list = cursor.fetchall()
@@ -305,8 +302,7 @@ def search_app_from_admin():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-
-    cursor.execute("EXEC ContactSearchAppointmentAdminPanel ?",[contact_number])
+    cursor.execute("EXEC ContactSearchAppointmentAdminPanel1 ?",[contact_number])
     app_list = cursor.fetchall()
 
     cursor.close()
@@ -474,9 +470,21 @@ def cancel_appointment(appointment_id):
 def Payment():
     patientId = session['user_id']
     Role = session['role']
-
+    
     if patientId and Role == 'Patient':
-        return render_template('bill_template.html')
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , patientId)
+        username = cursor.fetchone()
+        
+        cursor.execute("EXEC PaymentSpecificPrescriptionForSpecificPatient ? , ? ",[patientId , 1])
+        ans = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+    return render_template('bill_template.html',username=username , ans=ans)
+
 
 
 @app.route('/logout.html')
