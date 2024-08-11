@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
+        'SERVER=DESKTOP-F7J0SB1\SQLEXPRESS;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -275,6 +275,37 @@ def search_contact_from_doctor():
 
     return render_template('search.html', ressearch=ressearch)
    
+
+@app.route('/doctorsearch.html', methods=['GET'])
+def search_doctor_from_admin():
+    email_number = request.args.get('doctor_contact')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+   
+    cursor.execute("EXEC EmailSearchDoctorAdminPanel ?", [email_number])
+    admin_doctor_list = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    if not admin_doctor_list:  # If no entries found
+        flash('No entries found!', 'danger')
+        return redirect(url_for('admin_panel'))
+    
+    return render_template('doctorsearch.html', admin_doctor_list=admin_doctor_list)
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/patient_search_admin.html')
 def search_patient_from_admin():
