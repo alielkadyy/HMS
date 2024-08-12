@@ -7,7 +7,7 @@ app.secret_key = 'your_unique_secret_key'
 def get_db_connection():
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=DESKTOP-F7J0SB1\SQLEXPRESS;'
+        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
@@ -296,17 +296,6 @@ def search_doctor_from_admin():
     return render_template('doctorsearch.html', admin_doctor_list=admin_doctor_list)
 
 
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/patient_search_admin.html')
 def search_patient_from_admin():
 
@@ -334,7 +323,7 @@ def search_app_from_admin():
     cursor = conn.cursor()
     
 
-    cursor.execute("EXEC ContactSearchAppointmentAdminPanel ?",[contact_number])
+    cursor.execute("EXEC ContactSearchAppointmentAdminPanel1 ?",[contact_number])
     app_list = cursor.fetchall()
 
     cursor.close()
@@ -342,22 +331,37 @@ def search_app_from_admin():
 
     return render_template('appsearch.html', app_list=app_list)
 
+@app.route('/messearch.html')
+def search_contact_from_admin():
+        contact_number = request.args.get('mes_contact')
 
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
 
+        cursor.execute("EXEC ContactSearchMessageAdminPanel ?",[contact_number])
+        mes_list = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template('messearch.html', mes_list=mes_list)
 
 @app.route('/prescribe.html')
 def prescribe():
 
     doctor_id = session['user_id']   # Replace this with the actual doctor ID from the session
     Role = session['role']
+
     if doctor_id and Role == 'Doctor':
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , doctor_id)
         username = cursor.fetchone()
-
-
+        #cursor.execute("""INSERT INTO Prescriptions (appointment_id , patient_id , doctor_id , date , medication , allergy , dosage , payment_status)
+                          #  VALUES(? , ?, ?, ? , ? , ? , ? , ?)""" , (appointment_id ,patient_id , doctor_id ,f"{appointment_date} {appointment_time}" ,med , alleg , dosage))
+       # conn.commit()
         cursor.close()
         conn.close()
     else:
@@ -502,7 +506,7 @@ def cancel_appointment(appointment_id):
 def Payment():
     patientId = session['user_id']
     Role = session['role']
-    
+    prescribe_id =  request.args.get('prescribe_id')
     if patientId and Role == 'Patient':
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -510,14 +514,12 @@ def Payment():
         cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , patientId)
         username = cursor.fetchone()
         
-        cursor.execute("EXEC PaymentSpecificPrescriptionForSpecificPatient ? , ? ",[patientId , 1])
+        cursor.execute("EXEC PaymentSpecificPrescriptionForSpecificPatient ? , ? ",[patientId , prescribe_id])
         ans = cursor.fetchall()
 
         cursor.close()
         conn.close()
     return render_template('bill_template.html',username=username , ans=ans)
-
-
 
 @app.route('/logout.html')
 def logout():
