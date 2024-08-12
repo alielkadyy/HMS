@@ -7,4 +7,4 @@
 						<span class="go-top"><i class="ti-angle-up"></i></span>
 					</div>
 				</div>
-			</footer>
+</footer>

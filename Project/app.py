@@ -282,7 +282,7 @@ def search_doctor_from_admin():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-   
+    email_number = email_number.strip()
     cursor.execute("EXEC EmailSearchDoctorAdminPanel ?", [email_number])
     admin_doctor_list = cursor.fetchall()
 
