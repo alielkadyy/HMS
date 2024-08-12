@@ -1,4 +1,4 @@
-<?php error_reporting(0);?>
+
 <header class="navbar navbar-default navbar-static-top">
 					<!-- start: NAVBAR HEADER -->
 					<div class="navbar-header">
@@ -32,12 +32,8 @@
 
 
 
-									<?php $query=mysqli_query($con,"select fullName from users where id='".$_SESSION['id']."'");
-while($row=mysqli_fetch_array($query))
-{
-	echo $row['fullName'];
-}
-									?> <i class="ti-angle-down"></i></i></span>
+									
+									 <i class="ti-angle-down"></i></i></span>
 								</a>
 								<ul class="dropdown-menu dropdown-dark">
 									<li>
