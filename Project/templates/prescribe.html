@@ -88,12 +88,10 @@
 
               <textarea id="prescription" cols="86" rows ="10" name="prescription" required></textarea>
               </div><br><br><br>
-              <input type="hidden" name="fname" value="<?php echo $fname ?>" />
-              <input type="hidden" name="lname" value="<?php echo $lname ?>" />
-              <input type="hidden" name="appdate" value="<?php echo $appdate ?>" />
-              <input type="hidden" name="apptime" value="<?php echo $apptime ?>" />
-              <input type="hidden" name="pid" value="<?php echo $pid ?>" />
-              <input type="hidden" name="ID" value="<?php echo $ID ?>" />
+              <input type="hidden" name="appointment_id" value="{{ appointment_id }}">
+              <input type="hidden" name="appointment_date" value="{{ appointment_date }}">
+              <input type="hidden" name="appointment_time" value="{{ appointment_time }}">
+              <input type="hidden" name="patient_id" value="{{ patient_id }}">
               <br><br><br><br>
       <input type="submit" name="prescribe" value="Prescribe" class="btn btn-primary" style="margin-left: 40pc;">
       

@@ -213,15 +213,17 @@
                  ____________
                 {% endif %}
                       </td>
-                        <td>
+                      <td>
                         {% if row[9] != 'Cancelled by Patient' and  row[9] != 'Cancelled by Doctor' and row[9] != 'Confirmed' %}
-                        <a href="prescribe.html"
-                        tooltip-placement="top" tooltip="Remove" title="prescribe">
-                        <button class="btn btn-success">Prescibe</button></a>
+                        <a href="prescribe.html?patient_id={{ row[0] }}&appointment_id={{ row[1] }}&appointment_date={{ row[7] }}&appointment_time={{ row[8] }}"
+                           title="Prescribe">
+                          <button class="btn btn-success">Prescribe</button>
+                        </a>
                         {%else%}
-                         ____________
+                        ____________
                         {% endif %}
-                        </td>
+                      </td>
+                      
                       </tr></a>
                       {% endfor %}
                       </tr>

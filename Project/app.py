@@ -347,26 +347,63 @@ def search_contact_from_admin():
 
         return render_template('messearch.html', mes_list=mes_list)
 
-@app.route('/prescribe.html')
+@app.route('/prescribe.html', methods=['GET', 'POST'])
 def prescribe():
-
-    doctor_id = session['user_id']   # Replace this with the actual doctor ID from the session
+    doctor_id = session['user_id'] 
     Role = session['role']
 
     if doctor_id and Role == 'Doctor':
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        if request.method == 'POST':
+            # Getting data from the form in prescribe.html
+            disease = request.form.get('disease')
+            allergy = request.form.get('allergy')
+            prescription = request.form.get('prescription')
+            appointment_id = request.form.get('appointment_id')
+            appointment_date = request.form.get('appointment_date')
+            appointment_time = request.form.get('appointment_time')
+            patient_id = request.form.get('patient_id')
 
-        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , doctor_id)
-        username = cursor.fetchone()
-        #cursor.execute("""INSERT INTO Prescriptions (appointment_id , patient_id , doctor_id , date , medication , allergy , dosage , payment_status)
-                          #  VALUES(? , ?, ?, ? , ? , ? , ? , ?)""" , (appointment_id ,patient_id , doctor_id ,f"{appointment_date} {appointment_time}" ,med , alleg , dosage))
-       # conn.commit()
-        cursor.close()
-        conn.close()
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?", [doctor_id])
+            username = cursor.fetchone()
+
+            cursor.execute("""
+                INSERT INTO Prescriptions 
+                (appointment_id, patient_id, doctor_id, date, medication, allergy, dosage, payment_status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (appointment_id, patient_id, doctor_id, f"{appointment_date} {appointment_time}", prescription, allergy, disease, 0))
+
+            cursor.execute("UPDATE Appointments SET status = 'Confirmed' WHERE appointment_id = ?", [appointment_id])
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return redirect(url_for('doctor'))  # Redirect to a page after successfully saving the data
+
+        else:
+            # GET request handling to render prescribe.html with initial data
+            appointment_id = request.args.get('appointment_id')
+            appointment_date = request.args.get('appointment_date')
+            appointment_time = request.args.get('appointment_time')
+            patient_id = request.args.get('patient_id')
+
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?", [doctor_id])
+            username = cursor.fetchone()
+
+            cursor.close()
+            conn.close()
+
+            return render_template('prescribe.html', username=username, 
+                                   appointment_id=appointment_id, appointment_date=appointment_date, 
+                                   appointment_time=appointment_time, patient_id=patient_id)
     else:
-       return redirect(url_for('index1')) 
-    return render_template('prescribe.html' , username=username)
+        return redirect(url_for('index1'))
+
 
 @app.route('/patient-panel.html', methods=['GET', 'POST'])
 def patient_panel():
