@@ -1,21 +1,37 @@
-from flask import Flask, request, redirect, url_for, render_template, flash, session,jsonify, request,get_flashed_messages
+from flask import Flask, request, redirect, url_for, render_template, flash, session, jsonify, request
 import pyodbc
 from datetime import datetime
+
 app = Flask(__name__)
-app.secret_key = 'your_unique_secret_key'
+app.secret_key = 'DEPI_Project'
+
 
 def get_db_connection():
+    """
+        Make a connection to the SQL Server database using the specified connection string.
+
+        Returns:
+            pyodbc.Connection: active connection object to interact with the database.
+    """
     connection_string = (
         'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=YOUSSEF-ATEF\SQLEXPRESS;'
+        'SERVER=DESKTOP-NOS3O0I;'
         'DATABASE=HMS;'
         'Trusted_Connection=yes;'
     )
     conn = pyodbc.connect(connection_string)
     return conn
 
+
 @app.route('/register', methods=['POST'])
 def register():
+    """
+        Handles the registration of a new patient and inserts the patient's details into the Users table in the database.
+
+        Returns:
+            Redirects to the 'index' page if successful, otherwise displays an error message if passwords do not match
+            or email already exist.
+    """
     first_name = request.form.get('fname')
     last_name = request.form.get('lname')
     gender = request.form.get('gender')
@@ -29,16 +45,31 @@ def register():
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO Users (first_name, last_name, gender, email, contact, password, role, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                   (first_name, last_name, gender, email, contact, password, 'Patient', ''))
+
+    existing_user = cursor.execute('SELECT * FROM Users WHERE email = ?', (email,)).fetchone()
+
+    if existing_user:
+        conn.close()
+        return b'Email already exists!'
+
+    cursor.execute(
+        'INSERT INTO Users (first_name, last_name, gender, email, contact, password, role, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        (first_name, last_name, gender, email, contact, password, 'Patient', ''))
     conn.commit()
     cursor.close()
     conn.close()
 
     return redirect(url_for('index'))
 
+
 @app.route('/login_doctor', methods=['POST'])
 def login_doctor():
+    """
+       Handles the login for a doctor. Validates the email and password against the database.
+
+       Returns:
+           Redirects to the doctor's dashboard if successful, otherwise returns to the login page with an error message.
+    """
     email = request.form['email']
     password = request.form['password']
 
@@ -56,8 +87,15 @@ def login_doctor():
     else:
         return render_template('index.html', error_message_doctor='Wrong Email/Password')
 
+
 @app.route('/login_admin', methods=['POST'])
 def login_admin():
+    """
+        Handles the login for an admin. Validates the email and password against the database.
+
+        Returns:
+            Redirects to the admin dashboard if successful, otherwise returns to the login page with an error message.
+    """
     email = request.form['email']
     password = request.form['password']
 
@@ -75,14 +113,21 @@ def login_admin():
     else:
         return render_template('index.html', error_message_admin='Wrong Email/Password')
 
+
 @app.route('/admin-panel1.html')
 def admin():
+    """
+       Displays the admin panel with lists of doctors, patients, appointments, prescriptions, and contact messages.
+
+       Returns:
+           Renders the admin panel template if the user is an admin, otherwise redirects to the index page.
+    """
     admin_id = session['user_id']
-    Role = session['role']
-    if admin_id and Role == 'Admin':
+    role = session['role']
+    if admin_id and role == 'Admin':
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         cursor.execute("DoctorList")
         doctors = cursor.fetchall()
 
@@ -97,16 +142,23 @@ def admin():
 
         cursor.execute("SELECT name , email , contact , message FROM ContactMessages")
         messages = cursor.fetchall()
-        
+
         cursor.close()
         conn.close()
-        return render_template('admin-panel1.html', doctors=doctors, patients=patients, appointments=appointments, prescriptions=prescriptions ,messages=messages)
+        return render_template('admin-panel1.html', doctors=doctors, patients=patients, appointments=appointments,
+                               prescriptions=prescriptions, messages=messages)
     else:
         return redirect(url_for('index'))
 
 
 @app.route('/delete-doctor', methods=['POST'])
 def delete_doctor():
+    """
+        Deletes a doctor from the Users table based on their email. 'Only admins can perform this action'
+
+        Returns:
+            Redirects to the admin panel with a success or error message.
+    """
     email = request.form['demail']
 
     if not email:
@@ -138,6 +190,12 @@ def delete_doctor():
 
 @app.route('/admin-panel1.html', methods=['POST'])
 def add_doctor():
+    """
+        Adds a new doctor to the Users table. 'Only admins can perform this action'
+
+        Returns:
+            Redirects to the admin panel after successfully adding the doctor.
+    """
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
     gender = request.form.get('gender')
@@ -153,16 +211,24 @@ def add_doctor():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute('INSERT INTO Users (first_name, last_name, gender, email, contact, password, role, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                   (first_name, last_name, gender, email, contact, password, 'Doctor', specialization))
+    cursor.execute(
+        'INSERT INTO Users (first_name, last_name, gender, email, contact, password, role, specialization) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        (first_name, last_name, gender, email, contact, password, 'Doctor', specialization))
     conn.commit()
     cursor.close()
     conn.close()
 
     return redirect(url_for('admin'))
 
+
 @app.route('/login', methods=['POST'])
 def login():
+    """
+        Handles the login for a patient. Validates the email and password against the database.
+
+        Returns:
+            Redirects to the patient panel if successful, otherwise redirects to the login page with an error message.
+    """
     email = request.form.get('email')
     password = request.form.get('password')
 
@@ -182,20 +248,48 @@ def login():
         flash('Invalid email or password', 'error')
         return redirect(url_for('index1'))  # Redirect back to login page
 
+
 @app.route('/')
 def index():
+    """
+        Renders the main index page of the application.
+
+        Returns:
+            The HTML template for the index page.
+    """
     return render_template('index.html')
+
 
 @app.route('/index.html')
 def home():
+    """
+        Renders the home page of the application.
+
+        Returns:
+            The HTML template for the home page.
+    """
     return render_template('index.html')
+
 
 @app.route('/index1.html')
 def index1():
+    """
+        Renders the secondary index page of the application.
+
+        Returns:
+            The HTML template for the secondary index page.
+    """
     return render_template('index1.html')
+
 
 @app.route('/contact.html', methods=['GET', 'POST'])
 def contact():
+    """
+        Handles the submission of the contact form. Inserts the user's message into the ContactMessages table.
+
+        Returns:
+            Redirects to the contact page with a success or error message.
+    """
     if request.method == 'POST':
         try:
             name = request.form['txtName']
@@ -206,7 +300,7 @@ def contact():
 
             conn = get_db_connection()
             cur = conn.cursor()
-            
+
             query = """
             INSERT INTO ContactMessages (name, Contact, email, message, date)
             VALUES (?, ?, ?, ?, ?)
@@ -215,49 +309,71 @@ def contact():
             conn.commit()
             cur.close()
             conn.close()
-            
+
             flash('Your message has been sent successfully!', 'success')
         except Exception as e:
             flash(f'An error occurred while sending your message: {e}', 'danger')
             print(e)
-        
+
         return redirect(url_for('contact'))
-    
+
     return render_template('contact.html')
+
 
 @app.route('/services.html')
 def services():
+    """
+        Renders the services Page of the Application
+
+        Returns:
+            The HTML template for the services page.
+    """
     return render_template('services.html')
+
 
 @app.route('/doctor-panel.html')
 def doctor():
-    doctor_id = session['user_id']   # Replace this with the actual doctor ID from the session
+    """
+        Renders the doctor's dashboard with options to view appointments, prescriptions, and perform actions.
+
+        Returns:
+            str: The HTML template for the doctor's dashboard.
+    """
+    doctor_id = session['user_id']  # Replace this with the actual doctor ID from the session
     Role = session['role']
     if doctor_id and Role == 'Doctor':
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute('EXEC AppointmentDetailsFromDoctor ?',doctor_id)
+        cursor.execute('EXEC AppointmentDetailsFromDoctor ?', doctor_id)
         app_list = cursor.fetchall()
 
-        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , doctor_id)
+        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?", doctor_id)
         username = cursor.fetchone()
 
-        cursor.execute('EXEC PrescriptionsDetailsFromDoctor ?',doctor_id)
+        cursor.execute('EXEC PrescriptionsDetailsFromDoctor ?', doctor_id)
         pr_list = cursor.fetchall()
 
-
-
         conn.close()
-        return render_template('doctor-panel.html', app_list=app_list, username=username, pr_list=pr_list )
+        return render_template('doctor-panel.html', app_list=app_list, username=username, pr_list=pr_list)
     else:
         return redirect(url_for('index'))
-    
+
+
 @app.route('/search.html')
 def search_contact_from_doctor():
+    """
+        Allows a doctor to search for an appointment using the patient's contact number.
 
+        Functionality:
+            - Retrieves the contact number from the request parameters.
+            - Executes the stored procedure ContactSearchAppDoctor using the doctor's ID and the contact number as parameters.
+            - Fetches the search results and displays them on the search.html page.
+
+        Returns:
+            The HTML template for the search page with the search results.
+    """
     contact_number = request.args.get('contact')
-
 
     # Connect to the database
     conn = get_db_connection()
@@ -265,19 +381,29 @@ def search_contact_from_doctor():
     doctor_id = session['user_id']
     Role = session['role']
 
-    
-   
-    cursor.execute("EXEC ContactSearchAppDoctor ?,?",[doctor_id,contact_number])
+    cursor.execute("EXEC ContactSearchAppDoctor ?,?", [doctor_id, contact_number])
     ressearch = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
     return render_template('search.html', ressearch=ressearch)
-   
+
 
 @app.route('/doctorsearch.html', methods=['GET'])
 def search_doctor_from_admin():
+    """
+        Allows an admin to search for a doctor using their email address.
+
+        Functionality:
+            - Retrieves the doctor's email address from the request parameters.
+            - Executes the stored procedure EmailSearchDoctorAdminPanel with the email address as a parameter.
+            - Fetches the list of doctors matching the email and displays them on the doctorsearch.html page.
+            - If no doctor is found, redirects to the admin panel with a 'No entries found!' message.
+
+        Returns:
+            The HTML template for the doctor search page with the list of doctors or a redirect to the admin panel.
+    """
     email_number = request.args.get('doctor_contact')
 
     conn = get_db_connection()
@@ -292,20 +418,29 @@ def search_doctor_from_admin():
     if not admin_doctor_list:  # If no entries found
         flash('No entries found!', 'danger')
         return redirect(url_for('admin_panel'))
-    
+
     return render_template('doctorsearch.html', admin_doctor_list=admin_doctor_list)
 
 
 @app.route('/patient_search_admin.html')
 def search_patient_from_admin():
+    """
+        Allows an admin to search for a patient using their contact number.
 
+        Functionality:
+            - Retrieves the patient's contact number from the request parameters.
+            - Executes the stored procedure ContactSearchPatientAdminPanel using the contact number as a parameter.
+            - Fetches the list of patients and displays them on the patient_search_admin.html page.
+
+        Returns:
+            The HTML template for the patient search page with the list of patients.
+    """
     contact_number = request.args.get('contact')
-
 
     conn = get_db_connection()
     cursor = conn.cursor()
-   
-    cursor.execute("EXEC ContactSearchPatientAdminPanel ?",[contact_number])
+
+    cursor.execute("EXEC ContactSearchPatientAdminPanel ?", [contact_number])
     admin_patient_list = cursor.fetchall()
 
     cursor.close()
@@ -313,17 +448,27 @@ def search_patient_from_admin():
 
     return render_template('patient_search_admin.html', admin_patient_list=admin_patient_list)
 
-    
+
 @app.route('/appsearch.html')
 def search_app_from_admin():
+    """
+        Allows an admin to search for appointments using a patient's contact number.
+
+        Functionality:
+            - Retrieves the contact number from the request parameters.
+            - Executes the stored procedure ContactSearchAppointmentAdminPanel1 with the contact number as a parameter.
+            - Fetches the list of appointments and displays them on the appsearch.html page.
+
+        Returns:
+            The HTML template for the appointment search page with the list of appointments.
+    """
 
     contact_number = request.args.get('contact1')
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    
 
-    cursor.execute("EXEC ContactSearchAppointmentAdminPanel1 ?",[contact_number])
+    cursor.execute("EXEC ContactSearchAppointmentAdminPanel1 ?", [contact_number])
     app_list = cursor.fetchall()
 
     cursor.close()
@@ -331,25 +476,43 @@ def search_app_from_admin():
 
     return render_template('appsearch.html', app_list=app_list)
 
+
 @app.route('/messearch.html')
 def search_contact_from_admin():
-        contact_number = request.args.get('mes_contact')
+    """
+        Allows an admin to search for messages sent by patients using their contact number.
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
+        Functionality:
+            - Retrieves the contact number from the request parameters.
+            - Executes the stored procedure ContactSearchMessageAdminPanel using the contact number as a parameter.
+            - Fetches the list of messages and displays them on the messearch.html page.
 
-        cursor.execute("EXEC ContactSearchMessageAdminPanel ?",[contact_number])
-        mes_list = cursor.fetchall()
+        Returns:
+            The HTML template for the message search page with the list of messages.
+    """
+    contact_number = request.args.get('mes_contact')
 
-        cursor.close()
-        conn.close()
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-        return render_template('messearch.html', mes_list=mes_list)
+    cursor.execute("EXEC ContactSearchMessageAdminPanel ?", [contact_number])
+    mes_list = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('messearch.html', mes_list=mes_list)
+
 
 @app.route('/prescribe.html', methods=['GET', 'POST'])
 def prescribe():
-    doctor_id = session['user_id'] 
+    """
+        Handles prescription submission by inserting the prescription details into the Prescriptions table.
+
+        Returns:
+            Redirects to the prescribe page with a success or error message.
+    """
+    doctor_id = session['user_id']
     Role = session['role']
 
     if doctor_id and Role == 'Doctor':
@@ -373,7 +536,9 @@ def prescribe():
                 INSERT INTO Prescriptions 
                 (appointment_id, patient_id, doctor_id, date, medication, allergy, dosage, payment_status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (appointment_id, patient_id, doctor_id, f"{appointment_date} {appointment_time}", prescription, allergy, disease, 0))
+            """, (
+            appointment_id, patient_id, doctor_id, f"{appointment_date} {appointment_time}", prescription, allergy,
+            disease, 0))
 
             cursor.execute("UPDATE Appointments SET status = 'Confirmed' WHERE appointment_id = ?", [appointment_id])
 
@@ -398,8 +563,8 @@ def prescribe():
             cursor.close()
             conn.close()
 
-            return render_template('prescribe.html', username=username, 
-                                   appointment_id=appointment_id, appointment_date=appointment_date, 
+            return render_template('prescribe.html', username=username,
+                                   appointment_id=appointment_id, appointment_date=appointment_date,
                                    appointment_time=appointment_time, patient_id=patient_id)
     else:
         return redirect(url_for('index1'))
@@ -407,6 +572,12 @@ def prescribe():
 
 @app.route('/patient-panel.html', methods=['GET', 'POST'])
 def patient_panel():
+    """
+        Renders the patient panel where the patient can view their appointment history and prescriptions.
+
+        Returns:
+            The HTML template for the patient panel with the required data.
+    """
     patientId = session['user_id']
     Role = session['role']
 
@@ -428,7 +599,8 @@ def patient_panel():
         if request.method == 'POST':
             selected_specialization = request.form.get('specialization')
             if selected_specialization:
-                cursor.execute("SELECT user_id, concat(first_name, ' ', last_name) FROM USERS WHERE specialization = ?", selected_specialization)
+                cursor.execute("SELECT user_id, concat(first_name, ' ', last_name) FROM USERS WHERE specialization = ?",
+                               selected_specialization)
                 doctorList = cursor.fetchall()
             else:
                 doctorList = []
@@ -441,16 +613,28 @@ def patient_panel():
     else:
         return redirect(url_for('index1'))
 
-    
+    return render_template('patient-panel.html', appointments=appointments, prescription=prescription,
+                           username=username, spec=spec, doctorList=doctorList)
 
-    return render_template('patient-panel.html', appointments=appointments, prescription=prescription, username=username, spec=spec, doctorList=doctorList)
 
 @app.route('/get-doctors', methods=['POST'])
 def get_doctors():
+    """
+        Retrieves a list of doctors based on their specialization.
+
+        Functionality:
+            - Retrieves the selected specialization from the form data.
+            - Executes a SQL query to get the user_id and full name of doctors matching the specialization.
+            - Returns a JSON object containing the list of doctors.
+
+        Returns:
+            A JSON object containing a list of doctors with their user IDs and names.
+    """
+
     specialization = request.form.get('specialization')
     if not specialization:
         return jsonify({'error': 'Specialization not provided'}), 400
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -468,13 +652,25 @@ def get_doctors():
 
         # Convert tuple list to a list of dictionaries for JSON serialization
         doctors_list = [{'user_id': doctor[0], 'name': doctor[1]} for doctor in doctors]
-        
+
         return jsonify(doctors_list)
     except Exception:
         return jsonify({'error': 'An internal error occurred'}), 500
 
+
 @app.route('/create-appointment', methods=['POST'])
 def create_appointment():
+    """
+        Handles the creation of a new appointment.
+
+        Functionality:
+            - Retrieves the selected specialization, doctor, appointment date, and time from the form data.
+            - Queries the DoctorView view to retrieve the doctor’s user_id based on their full name.
+            - Inserts the appointment details into the Appointments table.
+
+        Returns:
+            A redirect to the patient panel with a success message.
+    """
     # Get form data
     specialization = request.form.get('SelectSpecilization')
     doctor_name = request.form.get('doctors')
@@ -515,8 +711,19 @@ def create_appointment():
     flash('Appointment set successfully!')
     return redirect(url_for('patient_panel'))
 
+
 @app.route('/cancel-appointment/<int:appointment_id>', methods=['POST'])
 def cancel_appointment(appointment_id):
+    """
+        Cancels an appointment based on the appointment ID.
+
+        Functionality:
+            - Checks the user role from the session.
+            - Updates the status of the appointment in the Appointments table to 'Cancelled by Patient' or 'Cancelled by Doctor' based on the role.
+
+        Returns:
+            A JSON response indicating success or failure.
+    """
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -538,37 +745,67 @@ def cancel_appointment(appointment_id):
     except Exception as e:
         print(e)
         return jsonify({'success': False}), 500
-    
+
+
 @app.route('/bill_template.html')
 def Payment():
+    """
+        Displays the payment details for a specific prescription.
+
+        Functionality:
+            - Retrieves the patient ID and role from the session.
+            - Fetches the patient’s name and payment details using the stored procedure PaymentSpecificPrescriptionForSpecificPatient.
+
+        Returns:
+            The HTML template for the bill with the patient's name and payment details.
+    """
     patientId = session['user_id']
     Role = session['role']
-    prescribe_id =  request.args.get('prescribe_id')
+    prescribe_id = request.args.get('prescribe_id')
     if patientId and Role == 'Patient':
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?" , patientId)
+        cursor.execute("SELECT concat(first_name , ' ' , last_name) FROM USERS WHERE user_id = ?", patientId)
         username = cursor.fetchone()
-        
-        cursor.execute("EXEC PaymentSpecificPrescriptionForSpecificPatient ? , ? ",[patientId , prescribe_id])
+
+        cursor.execute("EXEC PaymentSpecificPrescriptionForSpecificPatient ? , ? ", [patientId, prescribe_id])
         ans = cursor.fetchall()
 
         cursor.close()
         conn.close()
-    return render_template('bill_template.html',username=username , ans=ans)
+    return render_template('bill_template.html', username=username, ans=ans)
+
 
 @app.route('/logout.html')
 def logout():
-    session['role'] = ''
-    session['user_id'] = 0
+    """
+        Logs out the current user and clears their session.
+
+        Functionality:
+            - Resets the session's role and user ID.
+
+        Returns:
+            The HTML template for the logout page.
+    """
+    session.clear()
     return render_template('logout.html')
+
 
 @app.route('/logout1.html')
 def logout1():
-    session['role'] = ''
-    session['user_id'] = 0
+    """
+        Logs out the current user and clears their session.
+
+        Functionality:
+            - Resets the session's role and user ID.
+
+        Returns:
+            The HTML template for the logout page.
+    """
+    session.clear()
     return render_template('logout1.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
