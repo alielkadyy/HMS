@@ -46,8 +46,6 @@ The HMS project uses a SQL Server database with the following schema:
 
 ### Views
 
-- **P_Appoinment_details**: Displays appointment details for patients.
-- **Prescription_Details**: Displays prescription details for patients.
 - **DoctorView**: Displays a list of doctors with their full names, user IDs, gender, email, contact, password, role, and specialization.
 
 ### Stored Procedures
@@ -68,7 +66,7 @@ The HMS project uses a SQL Server database with the following schema:
 1. **Clone the repository**:
     ```bash
    git clone https://github.com/AshrafAbdelkhalek10/HMS.git
-   cd HMS
+   cd Project/HMS
 
 2. **Create a virtual environment**:
 
@@ -111,6 +109,18 @@ Here are some of the key API endpoints available in the application:
 - **POST** `/cancel-appointment/<int:appointment_id>`: Cancels an appointment.
 - **GET** `/get-doctors`: Retrieves doctors based on specialization.
 - **GET** `/search.html`: Search for appointments by patient contact.
+- **GET** `/admin-panel.html`: Renders the admin panel.
+- **POST** `/add-doctor`: Adds a new doctor.
+- **POST** `/delete-doctor`: Deletes a doctor based on their email.
+- **GET** `/view-appointment-history/<int:patient_id>`: Retrieves appointment history for a specific patient.
+- **GET** `/view-prescription/<int:patient_id>`: Retrieves prescription details for a specific patient.
+- **GET** `/appointment-details/<int:doctor_id>`: Retrieves appointment details for a specific doctor.
+- **GET** `/prescriptions-details/<int:doctor_id>`: Retrieves prescription details for a specific doctor.
+- **GET** `/contact-search-app-doctor`: Searches for appointments by a doctor's ID and patient contact.
+- **GET** `/payment-specific-prescription/<int:patient_id>/<int:prescription_id>`: Retrieves payment details for a specific prescription and patient.
+- **GET** `/contact-search-patient-admin`: Searches for patients by contact information.
+- **GET** `/contact-search-appointment-admin`: Searches for appointments by patient contact.
+
 
 ## Contributing 🤝
 
