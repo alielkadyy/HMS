@@ -288,10 +288,6 @@ def search_doctor_from_admin():
 
     cursor.close()
     conn.close()
-
-    if not admin_doctor_list:  # If no entries found
-        flash('No entries found!', 'danger')
-        return redirect(url_for('admin_panel'))
     
     return render_template('doctorsearch.html', admin_doctor_list=admin_doctor_list)
 
