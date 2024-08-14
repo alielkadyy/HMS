@@ -234,20 +234,15 @@ CREATE PROCEDURE ContactSearchPatientAdminPanel (@contact NVARCHAR(50))
 AS
 BEGIN
     SELECT
-        a.patient_id AS Patient_ID,
-        p.first_name AS Patient_First_Name,
-        p.last_name AS  Patient_Last_Name,
-        p.email AS Email,
-        p.contact AS Contact,
-        u.password AS Password
+        first_name AS Patient_First_Name,
+        last_name AS  Patient_Last_Name,
+        email AS Email,
+        contact AS Contact,
+        password AS Password
+
     FROM 
-        Appointments a
-    JOIN 
-        Users u ON a.patient_id = u.user_id
-    JOIN 
-        Users p ON a.patient_id = p.user_id
-    WHERE 
-        p.contact = @contact;
+       Users
+    WHERE role = 'Patient' AND contact = @contact;
 END
 GO
 
@@ -283,27 +278,14 @@ CREATE PROCEDURE EmailSearchDoctorAdminPanel (@email NVARCHAR(50))
 AS
 BEGIN
     SELECT
-
-        concat (d.first_name ,' ',d.last_name) AS Username,
-        u.password AS Password,
-        d.email AS Email,
+        concat(first_name ,' ',last_name) AS Username,
+        password AS Password,
+        email AS Email,
         250 AS Fees
-
-
-
-    FROM 
-        Appointments a
-    JOIN 
-        Users u ON a.patient_id = u.user_id
-    JOIN 
-        Users p ON a.patient_id = p.user_id
-    JOIN 
-        Users d ON a.doctor_id = d.user_id
-    WHERE 
-        d.email = @email;
+    FROM USERS
+    WHERE role = 'Doctor' AND email = @email;
 
 END
-
 GO
 -- Stored Procedure: Searches for contact Messages based on contact in the admin panel
 CREATE PROCEDURE ContactSearchMessageAdminPanel (@contact NVARCHAR(50))
