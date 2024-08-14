@@ -1,6 +1,6 @@
-drop Database HMS2
+CREATE Database HMS
 GO
-USE HMS2
+USE HMS
 GO
 
 -- Creating Users table
