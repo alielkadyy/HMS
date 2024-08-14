@@ -142,4 +142,7 @@ If you have any questions or suggestions, feel free to contact us:
 
 - **Email**: [Ashraf Abdelkhalek](mailto:abdelkhalekashraf0@gmail.com)
 - **GitHub**: [Ashraf Abdelkhalek](https://github.com/AshrafAbdelkhalek10)
+- **Email**: [Youssef Atef Ibrahim](mailto:yousefatef045@gmail.com)
+- **GitHub**: [Youssef Atef Ibrahim](https://github.com/yousefatef045)
+
 
