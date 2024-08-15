@@ -144,5 +144,6 @@ If you have any questions or suggestions, feel free to contact us:
 - **GitHub**: [Ashraf Abdelkhalek](https://github.com/AshrafAbdelkhalek10)
 - **Email**: [Youssef Atef Ibrahim](mailto:yousefatef045@gmail.com)
 - **GitHub**: [Youssef Atef Ibrahim](https://github.com/yousefatef045)
-
+- **Email**: [Motaz Hamed](mailto:motazhamed00@gmail.com)
+- **GitHub**: [Motaz Hamed](https://github.com/mo3taz7amed)
 
