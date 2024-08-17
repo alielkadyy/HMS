@@ -146,4 +146,6 @@ If you have any questions or suggestions, feel free to contact us:
 - **GitHub**: [Youssef Atef Ibrahim](https://github.com/yousefatef045)
 - **Email**: [Motaz Hamed](mailto:motazhamed00@gmail.com)
 - **GitHub**: [Motaz Hamed](https://github.com/mo3taz7amed)
+- **Email**: [Ahmed Safwat](mailto:proahmedsafwat412@gmail.com)
+- **GitHub**: [Ahmed Safwat](https://github.com/ahmedSaf412)
 
