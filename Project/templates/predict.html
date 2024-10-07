@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predict Length of Stay</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='contact.min.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap">
+    <style>
+        body {
+            background: -webkit-linear-gradient(left, #3931af, #00c6ff);
+        }
+        .contact-form {
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 80px;
+            padding: 30px;
+        }
+        .prediction-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand js-scroll-trigger" href="#" style="margin-top: 10px;margin-left:-65px;font-family: 'IBM Plex Sans', sans-serif;">
+                <h4><i class="fa fa-user-plus" aria-hidden="true"></i>&nbsp GLOBAL HOSPITALS</h4>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" style="margin-right: 40px;">
+                        <a class="nav-link js-scroll-trigger" href="index.html" style="color: white;font-family: 'IBM Plex Sans', sans-serif;">
+                            <h6>HOME</h6>
+                        </a>
+                    </li>
+                    <li class="nav-item" style="margin-right: 40px;">
+                        <a class="nav-link js-scroll-trigger" href="services.html" style="color: white;font-family: 'IBM Plex Sans', sans-serif;">
+                            <h6>ABOUT US</h6>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="contact.html" style="color: white;font-family: 'IBM Plex Sans', sans-serif;">
+                            <h6>CONTACT</h6>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link js-scroll-trigger" href="predict.html" style="color: white;font-family: 'IBM Plex Sans', sans-serif;">
+                            <h6>Predict</h6>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 mx-auto">
+                <div class="contact-form">
+                    <h2 class="text-center mb-4">Hospital Length of Stay Predictor</h2>
+                    <form id="predictionForm" method="POST">
+                        <div class="row">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <h4>Basic Information</h4>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select name="gender" class="form-control" required>
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>BMI</label>
+                                    <input type="number" name="bmi" class="form-control" step="0.1" required>
+                                </div>
+                            </div>
+
+                            <!-- Clinical Measurements -->
+                            <div class="col-md-6">
+                                <h4>Clinical Measurements</h4>
+                                <div class="form-group">
+                                    <label>Hemoglobin Level (g/dL)</label>
+                                    <input type="number" name="hemo" class="form-control" step="0.1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Blood Glucose Level (mg/dL)</label>
+                                    <input type="number" name="glucose" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Medical Conditions -->
+                            <div class="col-md-12">
+                                <h4>Medical Conditions</h4>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="asthma" name="asthma" value="1">
+                                    <label class="form-check-label" for="asthma">Asthma</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="depression" name="depress" value="1">
+                                    <label class="form-check-label" for="depression">Depression</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="malnutrition" name="malnutrition" value="1">
+                                    <label class="form-check-label" for="malnutrition">Malnutrition</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">Predict Length of Stay</button>
+                        </div>
+                    </form>
+
+                    <div id="predictionResult" class="prediction-result bg-light">
+                        <h4 class="text-center">Predicted Length of Stay: <span id="stayLength" class="text-primary"></span> days</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#predictionForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Gather form data
+                let formData = $(this).serializeArray();
+                let data = {};
+                
+                // Convert form data to object and handle checkboxes
+                formData.forEach(function(item) {
+                    data[item.name] = item.value;
+                });
+                
+                // Set unchecked checkboxes to 0
+                ['asthma', 'depress', 'malnutrition'].forEach(function(condition) {
+                    if (!(condition in data)) {
+                        data[condition] = '0';
+                    }
+                });
+                
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        $('#stayLength').text(response.prediction.toFixed(1));
+                        $('#predictionResult').slideDown();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while making the prediction: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

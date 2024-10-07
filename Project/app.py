@@ -1,9 +1,14 @@
 from flask import Flask, request, redirect, url_for, render_template, flash, session, jsonify, request
 import pyodbc
 from datetime import datetime
-
+import numpy as np
+import joblib
 app = Flask(__name__)
 app.secret_key = 'DEPI_Project'
+
+
+#add the model to app
+model = joblib.load('length_of_stay_model_compressed.pkl')
 
 
 def get_db_connection():
@@ -249,6 +254,72 @@ def login():
         return redirect(url_for('index1'))  # Redirect back to login page
 
 
+@app.route('/predict.html', methods=['GET'])
+def predict_page():
+    """
+    Render the prediction page
+    """
+    return render_template('predict.html')
+#length_of_stay_model_compressed.pkl
+@app.route('/predict', methods=['POST'])
+def predict():
+    """
+    Handle prediction requests and return estimated length of stay
+    """
+    try:
+        # Extract features from form
+        data = {
+            'gender': int(request.form.get('gender', 0)),
+            'bmi': float(request.form.get('bmi', 0)),
+            'hemo': float(request.form.get('hemo', 0)),
+            'glucose': float(request.form.get('glucose', 0)),
+            'asthma': int(request.form.get('asthma', 0)),
+            'depress': int(request.form.get('depress', 0)),
+            'malnutrition': int(request.form.get('malnutrition', 0))
+        }
+
+        # Create default values for other required features
+        default_values = {
+            'rcount': 1,
+            'dialysisrenalendstage': 0,
+            'irondef': 0,
+            'pneum': 0,
+            'substancedependence': 0,
+            'psychologicaldisordermajor': 0,
+            'psychother': 0,
+            'fibrosisandother': 0,
+            'hematocrit': 40,
+            'neutrophils': 6.5,
+            'sodium': 140,
+            'bloodureanitro': 0.5,
+            'creatinine': 1.0,
+            'pulse': 72,
+            'respiration': 16,
+            'secondarydiagnosisnonicd9': 0,
+            'facid': 5,
+            'vdate_year': datetime.now().year,
+            'vdate_month': datetime.now().month,
+            'discharged_year': datetime.now().year,
+            'discharged_month': datetime.now().month
+        }
+
+        # Combine user input with default values
+        input_data = {**default_values, **data}
+
+        # Create input array for model
+        input_df = pd.DataFrame([input_data])
+
+        # Make prediction
+        prediction = model.predict(input_df)
+
+        # Return prediction as JSON
+        return jsonify({'prediction': float(prediction[0])})
+
+    except Exception as e:
+        print(f"Error making prediction: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+    
 @app.route('/')
 def index():
     """
