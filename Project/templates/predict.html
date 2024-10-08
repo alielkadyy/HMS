@@ -50,14 +50,14 @@
                             <h6>ABOUT US</h6>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" style="margin-right: 40px;">
                         <a class="nav-link js-scroll-trigger" href="contact.html" style="color: white;font-family: 'IBM Plex Sans', sans-serif;">
                             <h6>CONTACT</h6>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item"style="margin-right:70px;">
                         <a class="nav-link js-scroll-trigger" href="predict.html" style="color: white;font-family: 'IBM Plex Sans', sans-serif;">
-                            <h6>Predict</h6>
+                            <h6>PREDICT</h6>
                         </a>
                     </li>
                 </ul>
@@ -71,30 +71,6 @@
                     <h2 class="text-center mb-4">Hospital Length of Stay Predictor</h2>
                     <form id="predictionForm" method="POST">
                         <div class="row">
-                            <!-- Basic Information -->
-                            <div class="col-md-6">
-                                <h4>Basic Information</h4>
-                                <div class="form-group">
-                                    <label>Gender</label>
-                                    <select name="gender" class="form-control" required>
-                                        <option value="1">Male</option>
-                                        <option value="0">Female</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Readmission Count (rcount)</label>
-                                    <input type="number" name="rcount" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>BMI</label>
-                                    <input type="number" name="bmi" class="form-control" step="0.1" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Facility ID (facid)</label>
-                                    <input type="text" name="facid" class="form-control" required>
-                                </div>
-                            </div>
-
                             <!-- Clinical Measurements -->
                             <div class="col-md-6">
                                 <h4>Clinical Measurements</h4>
@@ -136,8 +112,30 @@
                                 </div>
                             </div>
 
-                            <!-- Medical Conditions -->
-                            <div class="col-md-12">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <h4>Basic Information</h4>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select name="gender" class="form-control" required>
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Readmission Count (rcount)</label>
+                                    <input type="number" name="rcount" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>BMI</label>
+                                    <input type="number" name="bmi" class="form-control" step="0.1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Facility ID (facid)</label>
+                                    <input type="text" name="facid" class="form-control" required>
+                                </div>
+
+                                <!-- Medical Conditions -->
                                 <h4>Medical Conditions</h4>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="dialysisrenalendstage" name="dialysisrenalendstage" value="1">
@@ -173,32 +171,21 @@
                                 </div>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="fibrosisandother" name="fibrosisandother" value="1">
-                                    <label class="form-check-label" for="fibrosisandother">Fibrosis and Other</label>
+                                    <label class="form-check-label" for="fibrosisandother">Fibrosis and Other Diseases</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="malnutrition" name="malnutrition" value="1">
                                     <label class="form-check-label" for="malnutrition">Malnutrition</label>
                                 </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="secondarydiagnosisnonicd9" name="secondarydiagnosisnonicd9" value="1">
-                                    <label class="form-check-label" for="secondarydiagnosisnonicd9">Secondary Diagnosis (non-ICD9)</label>
-                                </div>
                             </div>
                         </div>
 
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary">Predict Length of Stay</button>
-                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Predict</button>
                     </form>
-
-                    <div id="predictionResult" class="prediction-result bg-light">
-                        <h4 class="text-center">Predicted Length of Stay: <span id="stayLength" class="text-primary"></span> days</h4>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
@@ -239,5 +226,4 @@
         });
     </script>
 </body>
-
 </html>
