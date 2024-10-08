@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Predict Length of Stay</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}" />
@@ -11,12 +12,14 @@
         body {
             background: -webkit-linear-gradient(left, #3931af, #00c6ff);
         }
+
         .contact-form {
             background: #f8f9fa;
             border-radius: 10px;
             margin-top: 80px;
             padding: 30px;
         }
+
         .prediction-result {
             margin-top: 20px;
             padding: 15px;
@@ -25,6 +28,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
         <div class="container">
@@ -78,8 +82,16 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                    <label>Readmission Count (rcount)</label>
+                                    <input type="number" name="rcount" class="form-control" required>
+                                </div>
+                                <div class="form-group">
                                     <label>BMI</label>
                                     <input type="number" name="bmi" class="form-control" step="0.1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Facility ID (facid)</label>
+                                    <input type="text" name="facid" class="form-control" required>
                                 </div>
                             </div>
 
@@ -91,8 +103,36 @@
                                     <input type="number" name="hemo" class="form-control" step="0.1" required>
                                 </div>
                                 <div class="form-group">
+                                    <label>Hematocrit (%)</label>
+                                    <input type="number" name="hematocrit" class="form-control" step="0.1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Neutrophils (%)</label>
+                                    <input type="number" name="neutrophils" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sodium (mmol/L)</label>
+                                    <input type="number" name="sodium" class="form-control" required>
+                                </div>
+                                <div class="form-group">
                                     <label>Blood Glucose Level (mg/dL)</label>
                                     <input type="number" name="glucose" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Blood Urea Nitrogen (mg/dL)</label>
+                                    <input type="number" name="bloodureanitro" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Creatinine (mg/dL)</label>
+                                    <input type="number" name="creatinine" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pulse (bpm)</label>
+                                    <input type="number" name="pulse" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Respiration Rate (breaths/min)</label>
+                                    <input type="number" name="respiration" class="form-control" required>
                                 </div>
                             </div>
 
@@ -100,16 +140,48 @@
                             <div class="col-md-12">
                                 <h4>Medical Conditions</h4>
                                 <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="dialysisrenalendstage" name="dialysisrenalendstage" value="1">
+                                    <label class="form-check-label" for="dialysisrenalendstage">Dialysis Renal End Stage</label>
+                                </div>
+                                <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="asthma" name="asthma" value="1">
                                     <label class="form-check-label" for="asthma">Asthma</label>
                                 </div>
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="depression" name="depress" value="1">
-                                    <label class="form-check-label" for="depression">Depression</label>
+                                    <input type="checkbox" class="form-check-input" id="irondef" name="irondef" value="1">
+                                    <label class="form-check-label" for="irondef">Iron Deficiency</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="pneum" name="pneum" value="1">
+                                    <label class="form-check-label" for="pneum">Pneumonia</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="substancedependence" name="substancedependence" value="1">
+                                    <label class="form-check-label" for="substancedependence">Substance Dependence</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="psychologicaldisordermajor" name="psychologicaldisordermajor" value="1">
+                                    <label class="form-check-label" for="psychologicaldisordermajor">Major Psychological Disorder</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="depress" name="depress" value="1">
+                                    <label class="form-check-label" for="depress">Depression</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="psychother" name="psychother" value="1">
+                                    <label class="form-check-label" for="psychother">Psychotherapy</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="fibrosisandother" name="fibrosisandother" value="1">
+                                    <label class="form-check-label" for="fibrosisandother">Fibrosis and Other</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="malnutrition" name="malnutrition" value="1">
                                     <label class="form-check-label" for="malnutrition">Malnutrition</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="secondarydiagnosisnonicd9" name="secondarydiagnosisnonicd9" value="1">
+                                    <label class="form-check-label" for="secondarydiagnosisnonicd9">Secondary Diagnosis (non-ICD9)</label>
                                 </div>
                             </div>
                         </div>
@@ -134,23 +206,23 @@
         $(document).ready(function() {
             $('#predictionForm').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 // Gather form data
                 let formData = $(this).serializeArray();
                 let data = {};
-                
+
                 // Convert form data to object and handle checkboxes
                 formData.forEach(function(item) {
                     data[item.name] = item.value;
                 });
-                
+
                 // Set unchecked checkboxes to 0
-                ['asthma', 'depress', 'malnutrition'].forEach(function(condition) {
+                ['dialysisrenalendstage', 'asthma', 'irondef', 'pneum', 'substancedependence', 'psychologicaldisordermajor', 'depress', 'psychother', 'fibrosisandother', 'malnutrition', 'secondarydiagnosisnonicd9'].forEach(function(condition) {
                     if (!(condition in data)) {
                         data[condition] = '0';
                     }
                 });
-                
+
                 $.ajax({
                     url: '/predict',
                     type: 'POST',
@@ -167,4 +239,5 @@
         });
     </script>
 </body>
+
 </html>
